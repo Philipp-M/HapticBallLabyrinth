@@ -17,8 +17,6 @@ private:
 
     void initialize(SDL_Window *window, SDL_GLContext &context);
 
-    void setUpDataBuffers();
-
 public:
     GLMain(SDL_Window *window, SDL_GLContext &context, std::string objFilePath, std::string materialFolder);
 

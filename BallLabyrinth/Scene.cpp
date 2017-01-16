@@ -7,7 +7,7 @@
 #include "Scene.hpp"
 
 Scene::Scene(std::string &objFilePath, std::string &materialRefFolder) :
-        camera(600, 800, 60.0, 0.01, 1000.0, glm::vec3(0.0, 40.0, 0.0), glm::vec3(1.0, 0.0, 0.0), 0.0, -90.0) {
+        camera(600, 800, 60.0, 0.01, 1000.0, glm::vec3(0.0, 40.0, 0.0), glm::vec3(0.0, 0.0, -1.0), 0.0, -90.0) {
     loadObjFile(objFilePath, materialRefFolder);
 
     lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 60.0, 10.0), Material::Color(glm::vec3(1.0, 0.8, 0.6)), 150, 1.0, 1.0)));
@@ -47,7 +47,7 @@ void Scene::loadObjFile(std::string filename, std::string &materialRefFolder) {
 }
 
 void Scene::draw(ShaderProgram &shaderProgram) {
-    shaderProgram.bind();
+    //shaderProgram.bind();
     shaderProgram.setUniform3f("cameraPosition", camera.getPosition());
     shaderProgram.setUniform1i("numPointLights", lights.size());
 
@@ -60,7 +60,7 @@ void Scene::draw(ShaderProgram &shaderProgram) {
         model->draw(shaderProgram);
     }
 
-    shaderProgram.unbind();
+    //shaderProgram.unbind();
 }
 
 void Scene::rotateModel(int id, int axis, float angle) {

@@ -46,9 +46,17 @@ int main(int argc, char *argv[]) {
     bool xAxisChanged = false;
     bool yAxisChanged = false;
 
+
+    unsigned int startTime = SDL_GetTicks();
+    unsigned int frames = 0;
+
     while (!quit) {
+
         glMain.display();
         SDL_GL_SwapWindow(mainwindow);
+
+
+
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -59,29 +67,29 @@ int main(int argc, char *argv[]) {
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
                             if(xAxisRotation < MAXROTATION) {
-                                glMain.rotateModel(0, 1, 1.0);
+                                glMain.rotateModel(0, 0, 1.0);
                                 xAxisRotation += 1.0;
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_DOWN:
                             if(xAxisRotation > -MAXROTATION) {
-                                glMain.rotateModel(0, 1, -1.0);
+                                glMain.rotateModel(0, 0, -1.0);
                                 xAxisRotation -= 1.0;
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_LEFT:
-                            if(yAxisRotation < MAXROTATION) {
-                                glMain.rotateModel(0, 0, 1.0);
-                                yAxisRotation += 1.0;
+                            if(yAxisRotation > -MAXROTATION) {
+                                glMain.rotateModel(0, 1, -1.0);
+                                yAxisRotation -= 1.0;
                                 yAxisChanged = true;
                             }
                             break;
                         case SDLK_RIGHT:
-                            if(yAxisRotation > -MAXROTATION) {
-                                glMain.rotateModel(0, 0, -1.0);
-                                yAxisRotation -= 1.0;
+                            if(yAxisRotation < MAXROTATION) {
+                                glMain.rotateModel(0, 1, 1.0);
+                                yAxisRotation += 1.0;
                                 yAxisChanged = true;
                             }
                             break;
@@ -110,21 +118,29 @@ int main(int argc, char *argv[]) {
         }
         if(!xAxisChanged) {
             if(xAxisRotation > 0.0) {
-                glMain.rotateModel(0, 1, -1.0);
+                glMain.rotateModel(0, 0, -1.0);
                 xAxisRotation -= 1.0;
             } else if(xAxisRotation < 0.0) {
-                glMain.rotateModel(0, 1, 1.0);
+                glMain.rotateModel(0, 0, 1.0);
                 xAxisRotation += 1.0;
             }
         }
         if(!yAxisChanged) {
             if(yAxisRotation > 0.0) {
-                glMain.rotateModel(0, 0, -1.0);
+                glMain.rotateModel(0, 1, -1.0);
                 yAxisRotation -= 1.0;
             } else if(yAxisRotation < 0.0) {
-                glMain.rotateModel(0, 0, 1.0);
+                glMain.rotateModel(0, 1, 1.0);
                 yAxisRotation += 1.0;
             }
+        }
+
+        if(SDL_GetTicks() - startTime >= 1000) {
+            std::cout << "fps: " << frames + 1 << std::endl;
+            startTime = SDL_GetTicks();
+            frames = 0;
+        } else {
+            frames++;
         }
     }
     /* Delete our opengl context, destroy our window, and shutdown SDL */

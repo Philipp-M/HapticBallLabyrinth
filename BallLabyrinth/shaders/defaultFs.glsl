@@ -32,7 +32,7 @@ out vec4 FragColor;
 
 void main()
 {
-	FragColor = vec4(0, 0, 0, 1.0);
+	FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 	vec4 tmpColor = vec4(diffuseColor, 1.0);
 
     vec3 normal = normalize(normalMatrix * vNormal);
@@ -62,6 +62,7 @@ void main()
 
         float attenuation = 1.0 / (1.0 + allPointLights[i].attenuation * disToLight * disToLight);
         FragColor += vec4(attenuation * allPointLights[i].colorIntensity * (ambientLight + difLight + specLight), 0.0);
+
     }
 }
 /*#version 330
