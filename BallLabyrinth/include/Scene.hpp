@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <vector>
-#include "Model.hpp"
+#include "GraphicsModel.hpp"
 #include "PointLight.hpp"
 #include "Camera.hpp"
 #include "ShaderProgram.hpp"
@@ -16,7 +16,7 @@
 
 class Scene {
 private:
-    std::vector<std::shared_ptr<Model>> models;
+    std::vector<std::shared_ptr<GraphicsModel>> models;
     std::vector<std::shared_ptr<PointLight>> lights;
     Camera camera;
 

@@ -32,14 +32,14 @@ void Scene::loadObjFile(std::string filename, std::string &materialRefFolder) {
 
     for (auto &object: objectShape) {
         if (object.mesh.material_ids.size() > 0) {
-            models.push_back(std::shared_ptr<Model>(new Model(object.mesh, object.name,
+            models.push_back(std::shared_ptr<GraphicsModel>(new GraphicsModel(object.mesh, object.name,
                                                               MaterialManager::getInstance().getByName(
                                                                       objectMaterial[object.mesh.material_ids[0]].name))));
         } else {
-            models.push_back(std::shared_ptr<Model>(new Model(object.mesh, object.name)));
+            models.push_back(std::shared_ptr<GraphicsModel>(new GraphicsModel(object.mesh, object.name)));
         }
 //        if (object.name == "light") {
-//            std::shared_ptr<Model> m = models[models.size() - 1];
+//            std::shared_ptr<GraphicsModel> m = models[models.size() - 1];
 //            lights.push_back(std::shared_ptr<PointLight>(
 //                    new PointLight(m->getCentroid(), m->getMaterial()->diffuseColor, 0.5, 0.001)));
 //        }

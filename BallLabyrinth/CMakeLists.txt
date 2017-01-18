@@ -31,8 +31,8 @@ set(SOURCE_FILES Shader.cpp
         include/GLMain.hpp
         tiny_obj_loader.cpp
         include/tiny_obj_loader.hpp
-        Model.cpp
-        include/Model.hpp
+        GraphicsModel.cpp
+        include/GraphicsModel.hpp
         Scene.cpp
         include/Scene.hpp
         MaterialManager.cpp
@@ -40,7 +40,7 @@ set(SOURCE_FILES Shader.cpp
         Camera.cpp
         include/Camera.hpp
         PointLight.cpp
-        include/PointLight.hpp)
+        include/PointLight.hpp include/Physics.hpp Physics.cpp)
 
 add_executable(BallLabyrinth main.cpp ${SOURCE_FILES})
 

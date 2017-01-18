@@ -9,7 +9,7 @@
 #include "ShaderProgram.hpp"
 #include "MaterialManager.hpp"
 
-class Model {
+class GraphicsModel {
 public:
 	struct Vertex {
 		Vertex(const glm::vec3 &vertex = glm::vec3(), const glm::vec3 &normal = glm::vec3(), const glm::vec2 &textureCoordinate = glm::vec2()) :
@@ -28,7 +28,7 @@ private:
 	bool bufferObjectsLoaded;
 
 	std::string name;
-	std::vector<Model::Vertex> vertexData;
+	std::vector<GraphicsModel::Vertex> vertexData;
 	std::vector<GLuint> indexData;
 	glm::vec3 centroid;
     std::shared_ptr<Material> material;
@@ -38,7 +38,7 @@ private:
 	void calculateVertexNormals();
 
 public:
-	Model(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material = nullptr);
+	GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material = nullptr);
 
 	void draw(ShaderProgram &shaderProgram);
 

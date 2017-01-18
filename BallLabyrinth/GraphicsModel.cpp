@@ -1,10 +1,10 @@
 #include <tiny_obj_loader.hpp>
 #include <iostream>
 #include <glm/gtx/rotate_vector.hpp>
-#include "Model.hpp"
+#include "GraphicsModel.hpp"
 
 
-void Model::computeVertices(tinyobj::mesh_t &mesh) {
+void GraphicsModel::computeVertices(tinyobj::mesh_t &mesh) {
     indexData = mesh.indices;
 
     for (int i = 0; i < mesh.positions.size() / 3; i++) {
@@ -31,7 +31,7 @@ void Model::computeVertices(tinyobj::mesh_t &mesh) {
     }
 }
 
-void Model::calculateVertexNormals() {
+void GraphicsModel::calculateVertexNormals() {
     for (int f = 0; f < indexData.size(); f += 3) {
         Vertex &v0 = vertexData[indexData[f]];
         Vertex &v1 = vertexData[indexData[f + 1]];
@@ -49,7 +49,7 @@ void Model::calculateVertexNormals() {
     }
 }
 
-Model::Model(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material) :
+GraphicsModel::GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material) :
         bufferObjectsLoaded(false), name(name), centroid(glm::vec3(0)), vertexData(mesh.positions.size() / 3),
         material(material), objectTransformationMatrix(glm::mat4(1.0f)) {
     computeVertices(mesh);
@@ -58,7 +58,7 @@ Model::Model(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material>
     refreshBuffers();
 }
 
-void Model::draw(ShaderProgram &shaderProgram) {
+void GraphicsModel::draw(ShaderProgram &shaderProgram) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(shaderProgram.attributeLocation("position"));
     shaderProgram.vertexAttribPointer("position", 3, GL_FLOAT, sizeof(Vertex), 0, false);
@@ -82,7 +82,7 @@ void Model::draw(ShaderProgram &shaderProgram) {
     glDrawElements(GL_TRIANGLES, (GLsizei) (size / sizeof(GLuint)), GL_UNSIGNED_INT, 0);
 }
 
-void Model::refreshBuffers() {
+void GraphicsModel::refreshBuffers() {
     /*if (bufferObjectsLoaded) {
         glDeleteBuffers(1, &vbo);
         glDeleteBuffers(1, &ibo);
@@ -96,19 +96,19 @@ void Model::refreshBuffers() {
     //bufferObjectsLoaded = true;
 }
 
-const glm::vec3 &Model::getCentroid() const {
+const glm::vec3 &GraphicsModel::getCentroid() const {
     return centroid;
 }
 
-const std::shared_ptr<Material> &Model::getMaterial() const {
+const std::shared_ptr<Material> &GraphicsModel::getMaterial() const {
     return material;
 }
 
-const glm::mat4 &Model::getObjectTransformationMatrix() const {
+const glm::mat4 &GraphicsModel::getObjectTransformationMatrix() const {
     return objectTransformationMatrix;
 }
 
-void Model::rotateAroundX(float angle) {
+void GraphicsModel::rotateAroundX(float angle) {
     float cosA = std::cos(glm::radians(angle));
     float sinA = std::sin(glm::radians(angle));
     glm::mat4 rotationMatX(1.0, 0.0, 0.0, 0.0,
@@ -118,7 +118,7 @@ void Model::rotateAroundX(float angle) {
     objectTransformationMatrix *= rotationMatX;
 }
 
-void Model::rotateAroundZ(float angle) {
+void GraphicsModel::rotateAroundZ(float angle) {
     float cosA = std::cos(glm::radians(angle));
     float sinA = std::sin(glm::radians(angle));
     glm::mat4 rotationMatZ(cosA, -sinA, 0.0, 0.0,
