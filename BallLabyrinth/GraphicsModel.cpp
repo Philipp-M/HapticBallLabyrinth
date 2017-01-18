@@ -54,7 +54,7 @@ GraphicsModel::GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shar
         material(material), objectTransformationMatrix(glm::mat4(1.0f)) {
     computeVertices(mesh);
 
-    std::cout << "Added model: " << name << ": number vertices: " << vertexData.size() << " material: " << material->name << std::endl;
+    std::cout << "Added model: " << name << " - number vertices: " << vertexData.size() << " - centroid: " << centroid.x << "/" << centroid.y << "/" << centroid.z << " - material: " << material->name << std::endl;
     refreshBuffers();
 }
 

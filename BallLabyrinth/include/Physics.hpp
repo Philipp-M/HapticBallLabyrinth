@@ -9,12 +9,16 @@
 #include <glm/vec3.hpp>
 #include "GraphicsModel.hpp"
 
+#define EARTH_ACCEL 9.81
+
 class Physics {
 public:
     struct StaticObject {
 
     };
     struct Ball {
+        std::shared_ptr<GraphicsModel> graphicsModel;
+
         float mass;
         float radius;
         glm::vec3 centerpoint;
@@ -28,7 +32,17 @@ public:
 
         glm::vec3 force;
 
-        std::shared_ptr<GraphicsModel> graphicsModel;
+        Ball(std::shared_ptr<GraphicsModel> &model, float mass=0.01, float radius=1.0):
+                graphicsModel(model), mass(mass), radius(radius), velocity(0.0), angularMomentum(0.0), omega(0.0), rotation(1.0) {
+            centerpoint = model->getCentroid();
+            force = glm::vec3(0.0, 0.0, -EARTH_ACCEL * mass);
+            inverseInertiaTensor = calculateInverseInertiaTensor(radius, mass);
+        }
+
+
+        glm::mat3 calculateInverseInertiaTensor(float radius, float mass) {
+            return glm::mat3();
+        }
     };
 private:
     double time;
@@ -38,6 +52,7 @@ private:
 
 public:
     Physics(double time = 0.0, double dt = 0.001);
+
 
 };
 

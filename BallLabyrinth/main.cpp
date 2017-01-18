@@ -7,7 +7,7 @@
 
 #define PROGRAM_NAME "Ball Labyrinth"
 
-#define OBJFILEPATH "scenes/maze1.obj"
+#define OBJFILEPATH "scenes/LabyrinthandBallblend.obj"
 #define MATERIALFOLDER "scenes/"
 
 #define MAXROTATION 10

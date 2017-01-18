@@ -1,7 +1,7 @@
 # Blender v2.77 (sub 0) OBJ File: 'LabyrinthandBallblend.blend'
 # www.blender.org
 mtllib LabyrinthandBallblend.mtl
-o Labyrinth_Maze.001
+o Labyrinth
 v -15.000000 0.000000 15.000000
 v -15.000000 5.000000 -15.000000
 v -15.000000 0.000000 -15.000000
@@ -606,7 +606,7 @@ f 41//4 159//4 165//4
 f 159//4 41//4 52//4
 f 41//1 167//1 39//1
 f 167//1 41//1 165//1
-o Ball_Icosphere.002
+o Ball
 v -12.800000 1.000000 -9.000000
 v -12.076393 1.552781 -8.474275
 v -13.076388 1.552780 -8.149351
