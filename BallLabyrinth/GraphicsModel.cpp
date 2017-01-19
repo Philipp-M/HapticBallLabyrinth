@@ -96,6 +96,10 @@ void GraphicsModel::refreshBuffers() {
     //bufferObjectsLoaded = true;
 }
 
+const std::string &GraphicsModel::getName() const {
+    return name;
+}
+
 const glm::vec3 &GraphicsModel::getCentroid() const {
     return centroid;
 }
@@ -126,6 +130,10 @@ void GraphicsModel::rotateAroundZ(float angle) {
                            0.0, 0.0, 1.0, 0.0,
                            0.0, 0.0, 0.0, 1.0);
     objectTransformationMatrix *= rotationMatZ;
+}
+
+void GraphicsModel::translate(glm::vec3 translationVec) {
+    objectTransformationMatrix = glm::translate(objectTransformationMatrix, translationVec);
 }
 
 

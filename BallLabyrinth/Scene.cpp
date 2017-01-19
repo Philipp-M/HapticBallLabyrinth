@@ -78,4 +78,13 @@ void Scene::rotateModel(int id, int axis, float angle) {
     }
 }
 
+std::shared_ptr<GraphicsModel> Scene::getModelByName(std::string name) {
+    for(auto &model: models) {
+        if(model->getName() == name) {
+            return model;
+        }
+    }
+    return nullptr;
+}
+
 

@@ -44,6 +44,8 @@ public:
 
 	void refreshBuffers();
 
+    const std::string &getName() const;
+
     const glm::vec3 &getCentroid() const;
 
     const std::shared_ptr<Material> &getMaterial() const;
@@ -53,6 +55,8 @@ public:
 	void rotateAroundX(float angle);
 
     void rotateAroundZ(float angle);
+
+	void translate(glm::vec3 translationVec);
 };
 
 

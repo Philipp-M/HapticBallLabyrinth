@@ -15,7 +15,7 @@ private:
 
     std::string objFilePath, materialFolder;
 
-    void initialize(SDL_Window *window, SDL_GLContext &context);
+    void initializeGraphics(SDL_Window *window, SDL_GLContext &context);
 
 public:
     GLMain(SDL_Window *window, SDL_GLContext &context, std::string objFilePath, std::string materialFolder);
@@ -30,5 +30,6 @@ public:
 
     void rotateModel(int id, int axis, float angle);
 
+    const std::shared_ptr<Scene> &getScene() const;
 };
 

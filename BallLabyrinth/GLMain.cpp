@@ -8,7 +8,7 @@
 
 GLMain::GLMain(SDL_Window *window, SDL_GLContext &context, std::string objFilePath,
                std::string materialFolder) : objFilePath(objFilePath), materialFolder(materialFolder) {
-    initialize(window, context);
+    initializeGraphics(window, context);
 }
 
 GLMain::~GLMain() {
@@ -19,7 +19,7 @@ void GLMain::cleanup() {
     glDeleteBuffers(1, &vbo);
 }
 
-void GLMain::initialize(SDL_Window *window, SDL_GLContext &context) {
+void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     /********** OpenGL Context and GLEW **********/
     context = SDL_GL_CreateContext(window);
 
@@ -69,6 +69,10 @@ void GLMain::display() {
 
 void GLMain::rotateModel(int id, int axis, float angle) {
     scene->rotateModel(id, axis, angle);
+}
+
+const std::shared_ptr<Scene> &GLMain::getScene() const {
+    return scene;
 }
 
 

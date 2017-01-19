@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <SDL2/SDL.h>
+#include "Physics.hpp"
 #include "ShaderProgram.hpp"
 #include "GLMain.hpp"
 
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
     SDL_GLContext maincontext; /* Our opengl context handle */
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) { /* Initialize SDL's Video subsystem */
-        std::cout << "Unable to initialize SDL";
+        std::cout << "Unable to initializeGraphics SDL";
         return 1;
     }
 
@@ -40,6 +41,9 @@ int main(int argc, char *argv[]) {
     GLMain glMain(mainwindow, maincontext, OBJFILEPATH, MATERIALFOLDER);
     SDL_Event event;
 
+    Physics physics(0.0, 0.001);
+    physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0);
+
     double xAxisRotation = 0.0;
     double yAxisRotation = 0.0;
 
@@ -51,12 +55,8 @@ int main(int argc, char *argv[]) {
     unsigned int frames = 0;
 
     while (!quit) {
-
         glMain.display();
         SDL_GL_SwapWindow(mainwindow);
-
-
-
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -142,6 +142,8 @@ int main(int argc, char *argv[]) {
         } else {
             frames++;
         }
+
+        physics.update();
     }
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     SDL_GL_DeleteContext(maincontext);
