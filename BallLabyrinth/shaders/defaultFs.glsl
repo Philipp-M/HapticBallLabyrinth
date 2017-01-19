@@ -61,8 +61,9 @@ void main()
         }
 
         float attenuation = 1.0 / (1.0 + allPointLights[i].attenuation * disToLight * disToLight);
-        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * (ambientLight + difLight + specLight), 0.0);
-
+//        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * (ambientLight + difLight + specLight), 0.0);
+        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * difLight, 0.0);
+        FragColor += vec4(specLight + ambientLight, 0.0);
     }
 }
 /*#version 330

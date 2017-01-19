@@ -23,7 +23,7 @@ class Physics {
 public:
     struct StaticObject {
         glm::vec3 edgepoint1, edgepoint2;
-        glm::vec3 normals
+        glm::vec3 normals;
 
         StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight, float wallwidth) {
             edgepoint1.x = x1;
@@ -33,12 +33,11 @@ public:
             if (y1 == y2) {
                 edgepoint2.x = x2;
                 edgepoint2.y = y2 + wallwidth;
-            }
-            else if (x1 == x2) {
+            } else if (x1 == x2) {
                 edgepoint2.x = x2 + wallwidth;
                 edgepoint2.y = y2;
             }
-            edgepoint2.z = floorheight+wallheight;
+            edgepoint2.z = floorheight + wallheight;
         }
     };
 
@@ -78,13 +77,13 @@ private:
     float dt;
     std::vector<Ball> ballObjects;
     std::vector<StaticObject> walls;
+
     void loadwalls(std::string file) {
         std::string line;
-        int linecount=0;
-        std::ifstream myfile (file);
-        if (myfile.is_open())
-        {
-            for(std::string line; std::getline(myfile, line); )   //read stream line by line
+        int linecount = 0;
+        std::ifstream myfile(file);
+        if (myfile.is_open()) {
+            for (std::string line; std::getline(myfile, line);)   //read stream line by line
             {
                 float wallheight, floorheight, wallwidth;
                 linecount++;
@@ -100,6 +99,7 @@ private:
             myfile.close();
         }
     }
+
 public:
     Physics(double time = 0.0, double dt = 0.001);
 
