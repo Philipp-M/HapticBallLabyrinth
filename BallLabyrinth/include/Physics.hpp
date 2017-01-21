@@ -96,7 +96,6 @@ public:
     void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon);
 
     void addWalls(std::string file);
-    void addFloor(glm::vec3 point);
 
     void rotateEarthAccelerationX(float pitch);
     void rotateEarthAccelerationY(float yaw);

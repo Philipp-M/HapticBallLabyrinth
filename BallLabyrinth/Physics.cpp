@@ -130,7 +130,7 @@ void Physics::Ball::updateGraphicsModel(float pitch, float yaw) {
     transVec.z = transVec.y;
     transVec.y = tmp;
 
-    //transVe  graphicsModel->translate(transVec);
+    graphicsModel->translate(transVec);
 }
 
 Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
