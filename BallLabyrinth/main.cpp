@@ -10,6 +10,7 @@
 
 #define OBJFILEPATH "scenes/LabyrinthandBallblend.obj"
 #define MATERIALFOLDER "scenes/"
+#define COLLISIONGEOMETRYPATH "scenes/walloutput.txt"
 
 #define MAXROTATION 10
 
@@ -42,7 +43,8 @@ int main(int argc, char *argv[]) {
     SDL_Event event;
 
     Physics physics(0.0, 0.001);
-    physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0);
+    physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0, 1.0);
+    physics.addWalls(COLLISIONGEOMETRYPATH);
 
     double xAxisRotation = 0.0;
     double yAxisRotation = 0.0;
@@ -67,29 +69,37 @@ int main(int argc, char *argv[]) {
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
                             if(xAxisRotation < MAXROTATION) {
-                                glMain.rotateModel(0, 0, 1.0);
+                                glMain.rotateModelAroundAxis(0, 0, 1.0);
+                                glMain.rotateModelAroundAxis(1, 0, 1.0);
                                 xAxisRotation += 1.0;
+                                physics.rotateEarthAccelerationX(1.0);
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_DOWN:
                             if(xAxisRotation > -MAXROTATION) {
-                                glMain.rotateModel(0, 0, -1.0);
+                                glMain.rotateModelAroundAxis(0, 0, -1.0);
+                                glMain.rotateModelAroundAxis(1, 0, -1.0);
                                 xAxisRotation -= 1.0;
+                                physics.rotateEarthAccelerationX(-1.0);
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_LEFT:
                             if(yAxisRotation > -MAXROTATION) {
-                                glMain.rotateModel(0, 1, -1.0);
+                                glMain.rotateModelAroundAxis(0, 1, -1.0);
+                                glMain.rotateModelAroundAxis(1, 1, -1.0);
                                 yAxisRotation -= 1.0;
+                                physics.rotateEarthAccelerationY(-1.0);
                                 yAxisChanged = true;
                             }
                             break;
                         case SDLK_RIGHT:
                             if(yAxisRotation < MAXROTATION) {
-                                glMain.rotateModel(0, 1, 1.0);
+                                glMain.rotateModelAroundAxis(0, 1, 1.0);
+                                glMain.rotateModelAroundAxis(1, 1, 1.0);
                                 yAxisRotation += 1.0;
+                                physics.rotateEarthAccelerationY(1.0);
                                 yAxisChanged = true;
                             }
                             break;
@@ -118,20 +128,28 @@ int main(int argc, char *argv[]) {
         }
         if(!xAxisChanged) {
             if(xAxisRotation > 0.0) {
-                glMain.rotateModel(0, 0, -1.0);
+                glMain.rotateModelAroundAxis(0, 0, -1.0);
+                glMain.rotateModelAroundAxis(1, 0, -1.0);
                 xAxisRotation -= 1.0;
+                physics.rotateEarthAccelerationX(-1.0);
             } else if(xAxisRotation < 0.0) {
-                glMain.rotateModel(0, 0, 1.0);
+                glMain.rotateModelAroundAxis(0, 0, 1.0);
+                glMain.rotateModelAroundAxis(1, 0, 1.0);
                 xAxisRotation += 1.0;
+                physics.rotateEarthAccelerationX(1.0);
             }
         }
         if(!yAxisChanged) {
             if(yAxisRotation > 0.0) {
-                glMain.rotateModel(0, 1, -1.0);
+                glMain.rotateModelAroundAxis(0, 1, -1.0);
+                glMain.rotateModelAroundAxis(1, 1, -1.0);
                 yAxisRotation -= 1.0;
+                physics.rotateEarthAccelerationY(-1.0);
             } else if(yAxisRotation < 0.0) {
-                glMain.rotateModel(0, 1, 1.0);
+                glMain.rotateModelAroundAxis(0, 1, 1.0);
+                glMain.rotateModelAroundAxis(1, 1, 1.0);
                 yAxisRotation += 1.0;
+                physics.rotateEarthAccelerationY(1.0);
             }
         }
 

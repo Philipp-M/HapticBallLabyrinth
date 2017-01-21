@@ -67,8 +67,8 @@ void GLMain::display() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);*/
 }
 
-void GLMain::rotateModel(int id, int axis, float angle) {
-    scene->rotateModel(id, axis, angle);
+void GLMain::rotateModelAroundAxis(int id, int axis, float angle) {
+    scene->rotateModelAroundAxis(id, axis, angle);
 }
 
 const std::shared_ptr<Scene> &GLMain::getScene() const {

@@ -52,11 +52,13 @@ public:
 
     const glm::mat4 &getObjectTransformationMatrix() const;
 
-	void rotateAroundX(float angle);
+	void rotateAroundAxisX(float angle);
 
-    void rotateAroundZ(float angle);
+    void rotateAroundAxisZ(float angle);
 
 	void translate(glm::vec3 translationVec);
+
+	void setNewPosition(glm::vec3 centerpoint);
 };
 
 

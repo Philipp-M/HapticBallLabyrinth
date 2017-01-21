@@ -112,7 +112,7 @@ const glm::mat4 &GraphicsModel::getObjectTransformationMatrix() const {
     return objectTransformationMatrix;
 }
 
-void GraphicsModel::rotateAroundX(float angle) {
+void GraphicsModel::rotateAroundAxisX(float angle) {
     float cosA = std::cos(glm::radians(angle));
     float sinA = std::sin(glm::radians(angle));
     glm::mat4 rotationMatX(1.0, 0.0, 0.0, 0.0,
@@ -122,7 +122,7 @@ void GraphicsModel::rotateAroundX(float angle) {
     objectTransformationMatrix *= rotationMatX;
 }
 
-void GraphicsModel::rotateAroundZ(float angle) {
+void GraphicsModel::rotateAroundAxisZ(float angle) {
     float cosA = std::cos(glm::radians(angle));
     float sinA = std::sin(glm::radians(angle));
     glm::mat4 rotationMatZ(cosA, -sinA, 0.0, 0.0,
@@ -134,6 +134,11 @@ void GraphicsModel::rotateAroundZ(float angle) {
 
 void GraphicsModel::translate(glm::vec3 translationVec) {
     objectTransformationMatrix = glm::translate(objectTransformationMatrix, translationVec);
+}
+
+void GraphicsModel::setNewPosition(glm::vec3 centerpoint) {
+    centroid = centerpoint;
+    refreshBuffers();
 }
 
 

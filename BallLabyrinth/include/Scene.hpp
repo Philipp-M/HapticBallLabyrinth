@@ -27,7 +27,7 @@ public:
 
     void draw(ShaderProgram &shader);
 
-    void rotateModel(int id, int axis, float angle);
+    void rotateModelAroundAxis(int id, int axis, float angle);
 
     std::shared_ptr<GraphicsModel> getModelByName(std::string name);
 };

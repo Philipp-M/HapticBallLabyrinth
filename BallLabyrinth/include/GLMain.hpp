@@ -28,7 +28,7 @@ public:
 
     void reshape(int width, int height);
 
-    void rotateModel(int id, int axis, float angle);
+    void rotateModelAroundAxis(int id, int axis, float angle);
 
     const std::shared_ptr<Scene> &getScene() const;
 };

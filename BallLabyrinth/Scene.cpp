@@ -63,13 +63,13 @@ void Scene::draw(ShaderProgram &shaderProgram) {
     //shaderProgram.unbind();
 }
 
-void Scene::rotateModel(int id, int axis, float angle) {
+void Scene::rotateModelAroundAxis(int id, int axis, float angle) {
 
     if(id < models.size() && id >= 0) {
         if(axis == 0) {
-            models[id]->rotateAroundX(angle);
+            models[id]->rotateAroundAxisX(angle);
         } else if(axis == 1) {
-            models[id]->rotateAroundZ(angle);
+            models[id]->rotateAroundAxisZ(angle);
         } else {
             std::cerr << "Wrong parameter for axis -> nothing happened." << std::endl;
         }

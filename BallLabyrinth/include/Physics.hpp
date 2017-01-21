@@ -11,6 +11,7 @@
 #include <glm/vec3.hpp>
 #include <glm/gtx/matrix_cross_product.hpp>
 #include <glm/gtx/orthonormalize.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include "GraphicsModel.hpp"
 #include <iostream>
 #include <fstream>
@@ -22,38 +23,17 @@
 
 class Physics {
 public:
-    struct StaticObject { //AABB box according to: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-        glm::vec3 edgepointmin, edgepointmax;
+    struct Collision {
+        bool collision = false;
+        glm::vec3 collisionNormal;
+        float distance;
+    };
+    //AABB box according to: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+    struct StaticObject {
+        glm::vec3 edgepointMin;
+        glm::vec3 edgepointMax;
 
-        StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight, float wallwidth) {
-
-            if (y1 == y2) {
-                if(x1>x2) {
-                    edgepointmin.x = x2;
-                    edgepointmax.x = x1;
-                } else {
-                    edgepointmin.x = x1;
-                    edgepointmax.x = x2;
-                }
-
-                edgepointmin.y = y1;
-                edgepointmax.y = y1 + wallwidth;
-            }
-            else if (x1 == x2) {
-                if(y1>y2) {
-                    edgepointmin.y = y2;
-                    edgepointmax.y = y1;
-                } else {
-                    edgepointmin.y = y1;
-                    edgepointmax.y = y2;
-                }
-
-                edgepointmin.x = x1;
-                edgepointmax.x = x1 + wallwidth;
-            }
-            edgepointmin.z = floorheight;
-            edgepointmax.z = floorheight+wallheight;
-        }
+        StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight, float wallwidth);
     };
 
     struct Ball {
@@ -61,7 +41,9 @@ public:
 
         float mass;
         float radius;
+        float collisionEpsilon;
         glm::vec3 centerpoint;
+        glm::vec3 oldCenterpoint;
 
         glm::vec3 velocity;
         glm::vec3 angularMomentum;
@@ -73,67 +55,46 @@ public:
 
         glm::vec3 force;
 
-        Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius) :
-                graphicsModel(model), mass(mass), radius(radius), centerpoint(model->getCentroid()), velocity(0.0),
-                angularMomentum(0.0), omega(0.0), rotation(1.0), torque(0.0), force(0.0, 0.0, -EARTH_ACCEL * mass) {
+        Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius, float collisionEpsilon) :
+                graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon), centerpoint(model->getCentroid().x, model->getCentroid().z, model->getCentroid().y), velocity(0.0),
+                angularMomentum(0.0), omega(0.0), rotation(1.0), torque(0.0), force(0.0, 0.0, 0.0) {
             calculateInverseInertiaTensor();
         }
 
-        void update(float dt);
-
         void calculateInverseInertiaTensor();
 
-        void updateCollision(glm::vec3 collisionNormal);
+        Collision collisionCheck(const StaticObject &wall);
 
+        void resetPosition(Collision &collision);
+
+        void updateCollisionImpulse(Collision &collision);
+
+        void updatePhysics(float dt, glm::vec3 earthAcceleration);
+
+        void updateGraphicsModel(float pitch, float yaw);
     };
+
 
 private:
     float time;
     float dt;
+    glm::vec3 earthAcceleration;
+    float pitch, yaw;
     std::vector<Ball> ballObjects;
     std::vector<StaticObject> walls;
 
-    void loadwalls(std::string file) {
-        std::string line;
-        int linecount=0;
-        std::ifstream myfile (file);
-        if (myfile.is_open())
-        {
-            for(std::string line; std::getline(myfile, line); )   //read stream line by line
-            {
-                float wallheight, floorheight, wallwidth;
-                linecount++;
-                std::istringstream in(line);
-                if (linecount == 1) {
-                    in >> wallheight >> floorheight >> wallwidth; //h f t
-                } else {
-                    float x1, y1, x2, y2;
-                    in >> x1 >> y1 >> x2 >> y2;
-                    walls.push_back(StaticObject(x1, y1, x2, y2, floorheight, wallheight, wallwidth));
-                }
-            }
-            myfile.close();
-        }
-    }
-
-    float getdistancefromAABB(StaticObject aabb, glm::vec3 point) {
-        // get box closest point to sphere center by clamping
-        float x = std::max(aabb.edgepointmin.x, std::min(point.x, aabb.edgepointmax.x));
-        float y = std::max(aabb.edgepointmin.y, std::min(point.y, aabb.edgepointmax.y));
-        float z = std::max(aabb.edgepointmin.z, std::min(point.z, aabb.edgepointmax.z));
-
-        // distance between point and boundingbox
-        float distance = std::sqrt((x - point.x) * (x - point.x) +
-                                 (y - point.y) * (y - point.y) +
-                                 (z - point.z) * (z - point.z));
-
-        return distance;
-    }
-
 public:
-    Physics(double time = 0.0, double dt = 0.001);
+    Physics(float time = 0.0, float dt = 0.001);
 
-    void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius);
+    void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon);
+
+    void addWalls(std::string file);
+    void addFloor(glm::vec3 point);
+
+    void rotateEarthAccelerationX(float pitch);
+    void rotateEarthAccelerationY(float yaw);
+
+    void handleCollisions();
 
     void update();
 };
