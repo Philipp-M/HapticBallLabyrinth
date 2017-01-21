@@ -23,7 +23,7 @@
 
 #include "GraphicsModel.hpp"
 
-#define EARTH_ACCEL 9.81
+#define EARTH_ACCEL 9810
 
 static std::mutex lock;
 

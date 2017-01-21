@@ -71,7 +71,11 @@ void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
 //            collision.collisionNormal)));
 //    velocity += j * collision.collisionNormal / mass;
 //    omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
-    velocity = glm::reflect(velocity, collision.collisionNormal);
+
+    float j = -(collisionEpsilon+1)*glm::dot(velocity,collision.collisionNormal);
+          j /= glm::dot(collision.collisionNormal,collision.collisionNormal)*(1.0/mass);
+    velocity += j * collision.collisionNormal / mass;
+//    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
 }
 
 void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
@@ -126,7 +130,7 @@ void Physics::Ball::updateGraphicsModel(float pitch, float yaw) {
     transVec.z = transVec.y;
     transVec.y = tmp;
 
-    graphicsModel->translate(transVec);
+    //transVe  graphicsModel->translate(transVec);
 }
 
 Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
@@ -143,11 +147,14 @@ void Physics::addWalls(std::string file) {
     std::ifstream myfile(file);
     if (myfile.is_open()) {
         float wallheight, floorheight, wallwidth;
+        float startx, starty, widthx, widthy;
         for (std::string line; std::getline(myfile, line);) {  //read stream line by line
             linecount++;
             std::istringstream in(line);
             if (linecount == 1) {
                 in >> wallheight >> floorheight >> wallwidth; //h f t
+            } else if(linecount == 2) {
+                in >> startx >> starty >> widthx >> widthy;
             } else {
                 float x1, y1, x2, y2;
                 in >> x1 >> y1 >> x2 >> y2;
@@ -156,7 +163,8 @@ void Physics::addWalls(std::string file) {
         }
         myfile.close();
 
-        walls.push_back(StaticObject(-16.0, -16.0, 16.0, -16.0, floorheight-2.0, 2.0, 30.0));
+        walls.push_back(StaticObject(startx, starty, startx+widthx, starty, 0.0, floorheight, widthy));
+        std::cout << "walls loaded: " << walls.size() << std::endl;
     }
 }
 
@@ -184,6 +192,7 @@ void Physics::handleCollisions() {
             ballObjects[0].updateCollisionImpulse(collision);
         }
     }
+
 }
 
 void Physics::update() {

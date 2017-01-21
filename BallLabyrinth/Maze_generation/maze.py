@@ -146,6 +146,7 @@ class Maze:
 			self.f = sys.stdout
 		self.f1 = open( "walloutput.txt", 'w' )
 		self.f1.write('%f %f %f\n' % (float(h), float(f), float(t)) )
+		self.f1.write('%f %f %f %f\n' % (float(-w/2), float(-l/2), float(w), float(l)) )
 
 		# The large mazes tend to hit the recursion limit
 		limit = sys.getrecursionlimit()
@@ -161,7 +162,7 @@ class Maze:
 
 		# Start a new maze
 		self.solved   = 0
-		self.start_x  = random.randint( 0, self.w - 1 )
+		self.start_x  = random.randint( 0, 0 )
 		self.finish_x = random.randint( 0, self.w - 1 )
 
 		# Initialize every cell with all four walls up
@@ -195,7 +196,7 @@ class Maze:
 		# outside the confines of the maze.
 
 		self.remove_border( self.start_x, self.start_y, Maze._NORTH )
-		self.remove_wall( self.start_x, self.start_y, Maze._NORTH )
+		#self.remove_wall( self.start_x, self.start_y, Maze._NORTH )
 
 		self.remove_border( self.finish_x, self.finish_y, Maze._SOUTH )
 		self.remove_wall( self.finish_x, self.finish_y, Maze._SOUTH )
@@ -363,7 +364,11 @@ class Maze:
 			self.f.write( '     wall_vert(%d, %d, %d);\n' % (x1, y1, y2) )
 		else:
 			self.f.write( '     wall_horz(%d, %d, %d);\n' % (x2, x1, y1) )
-		self.f1.write('%d %d %d %d\n' % (x1, y1, x2, y2) )
+		scalex = (self.width/(self.wall_thickness + 2 * self.w))
+		scaley = (self.length/(self.wall_thickness + 2 * self.h))
+		xoffset = -self.width/2
+		yoffset = -self.length/2
+		self.f1.write('%d %d %d %d\n' % (x1*scalex+xoffset, y1*scaley+yoffset, x2*scalex+xoffset, y2*scaley+yoffset) )
 
 	def draw_wall( self, x, y, d ):
 
