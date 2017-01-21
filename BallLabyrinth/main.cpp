@@ -9,7 +9,8 @@
 
 #define PROGRAM_NAME "Ball Labyrinth"
 
-#define OBJFILEPATH "scenes/LabyrinthandBallblend.obj"
+#define OBJFILEPATHLABYRINTH "scenes/Labyrinth.obj"
+#define OBJFILEPATHBALL "scenes/Ball.obj"
 #define MATERIALFOLDER "scenes/"
 #define COLLISIONGEOMETRYPATH "scenes/walloutput.txt"
 
@@ -40,11 +41,14 @@ int main(int argc, char *argv[]) {
     }
 
     bool quit = false;
-    GLMain glMain(mainwindow, maincontext, OBJFILEPATH, MATERIALFOLDER);
+
+    std::vector<std::string> objFilePaths = {OBJFILEPATHLABYRINTH, OBJFILEPATHBALL};
+    std::string materialFolder = MATERIALFOLDER;
+    GLMain glMain(mainwindow, maincontext, objFilePaths, materialFolder);
     SDL_Event event;
 
     Physics physics(0.01);
-    physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0, 1.0);
+    physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0, 0.5);
     physics.addWalls(COLLISIONGEOMETRYPATH);
 
     double xAxisRotation = 0.0;
@@ -71,38 +75,26 @@ int main(int argc, char *argv[]) {
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
-                            if(xAxisRotation < MAXROTATION) {
-                                glMain.rotateModelAroundAxis(0, 0, 1.0);
-                                glMain.rotateModelAroundAxis(1, 0, 1.0);
-                                xAxisRotation += 1.0;
-                                physics.rotateEarthAccelerationX(1.0);
+                            if (xAxisRotation > -MAXROTATION) {
+                                xAxisRotation -= 1.0;
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_DOWN:
-                            if(xAxisRotation > -MAXROTATION) {
-                                glMain.rotateModelAroundAxis(0, 0, -1.0);
-                                glMain.rotateModelAroundAxis(1, 0, -1.0);
-                                xAxisRotation -= 1.0;
-                                physics.rotateEarthAccelerationX(-1.0);
+                            if (xAxisRotation < MAXROTATION) {
+                                xAxisRotation += 1.0;
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_LEFT:
-                            if(yAxisRotation > -MAXROTATION) {
-                                glMain.rotateModelAroundAxis(0, 1, -1.0);
-                                glMain.rotateModelAroundAxis(1, 1, -1.0);
-                                yAxisRotation -= 1.0;
-                                physics.rotateEarthAccelerationY(-1.0);
+                            if (yAxisRotation < MAXROTATION) {
+                                yAxisRotation += 1.0;
                                 yAxisChanged = true;
                             }
                             break;
                         case SDLK_RIGHT:
-                            if(yAxisRotation < MAXROTATION) {
-                                glMain.rotateModelAroundAxis(0, 1, 1.0);
-                                glMain.rotateModelAroundAxis(1, 1, 1.0);
-                                yAxisRotation += 1.0;
-                                physics.rotateEarthAccelerationY(1.0);
+                            if (yAxisRotation > -MAXROTATION) {
+                                yAxisRotation -= 1.0;
                                 yAxisChanged = true;
                             }
                             break;
@@ -129,34 +121,30 @@ int main(int argc, char *argv[]) {
                     break;
             }
         }
-        if(!xAxisChanged) {
-            if(xAxisRotation > 0.0) {
-                glMain.rotateModelAroundAxis(0, 0, -1.0);
-                glMain.rotateModelAroundAxis(1, 0, -1.0);
+        if (!xAxisChanged) {
+            if (xAxisRotation > 0.0) {
                 xAxisRotation -= 1.0;
-                physics.rotateEarthAccelerationX(-1.0);
-            } else if(xAxisRotation < 0.0) {
-                glMain.rotateModelAroundAxis(0, 0, 1.0);
-                glMain.rotateModelAroundAxis(1, 0, 1.0);
+            } else if (xAxisRotation < 0.0) {
                 xAxisRotation += 1.0;
-                physics.rotateEarthAccelerationX(1.0);
             }
         }
-        if(!yAxisChanged) {
-            if(yAxisRotation > 0.0) {
-                glMain.rotateModelAroundAxis(0, 1, -1.0);
-                glMain.rotateModelAroundAxis(1, 1, -1.0);
+        if (!yAxisChanged) {
+            if (yAxisRotation > 0.0) {
                 yAxisRotation -= 1.0;
-                physics.rotateEarthAccelerationY(-1.0);
-            } else if(yAxisRotation < 0.0) {
-                glMain.rotateModelAroundAxis(0, 1, 1.0);
-                glMain.rotateModelAroundAxis(1, 1, 1.0);
+            } else if (yAxisRotation < 0.0) {
                 yAxisRotation += 1.0;
-                physics.rotateEarthAccelerationY(1.0);
             }
         }
 
-        if(SDL_GetTicks() - startTime >= 1000) {
+        glMain.resetModelRotationAroundAxis(0);
+        glMain.resetModelRotationAroundAxis(1);
+        glMain.rotateModelAroundAxis(0, 0, xAxisRotation);
+        glMain.rotateModelAroundAxis(1, 0, xAxisRotation);
+        glMain.rotateModelAroundAxis(0, 1, yAxisRotation);
+        glMain.rotateModelAroundAxis(1, 1, yAxisRotation);
+        physics.rotateEarthAccelerationXY(xAxisRotation, yAxisRotation);
+
+        if (SDL_GetTicks() - startTime >= 1000) {
             std::cout << "fps: " << frames + 1 << std::endl;
             startTime = SDL_GetTicks();
             frames = 0;
@@ -172,6 +160,7 @@ int main(int argc, char *argv[]) {
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     SDL_GL_DeleteContext(maincontext);
     SDL_DestroyWindow(mainwindow);
+
     SDL_Quit();
 
     return 0;

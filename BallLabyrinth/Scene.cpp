@@ -6,9 +6,11 @@
 #include <iostream>
 #include "Scene.hpp"
 
-Scene::Scene(std::string &objFilePath, std::string &materialRefFolder) :
+Scene::Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFolder) :
         camera(600, 800, 60.0, 0.01, 1000.0, glm::vec3(0.0, 40.0, 0.0), glm::vec3(0.0, 0.0, -1.0), 0.0, -90.0) {
-    loadObjFile(objFilePath, materialRefFolder);
+    for(auto &filePath: objFilePaths) {
+        loadObjFile(filePath, materialRefFolder);
+    }
 
     lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
     lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
@@ -24,10 +26,13 @@ void Scene::loadObjFile(std::string filename, std::string &materialRefFolder) {
     tinyobj::LoadObj(objectShape, objectMaterial, filename.c_str(), materialRefFolder.c_str());
 
     for (auto &m: objectMaterial) {
-        std::cout << m.name << " diffuse: " << m.diffuse[0] << "/" << m.diffuse[1] << "/" << m.diffuse[2] << std::endl;
-        MaterialManager::getInstance().addMaterial(std::shared_ptr<Material>(
-                new Material(m.name, Material::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]),
-                             Material::Color(m.specular[0], m.specular[1], m.specular[2]), m.shininess)));
+        if(MaterialManager::getInstance().getByName(m.name) == nullptr) {
+            std::cout << m.name << " diffuse: " << m.diffuse[0] << "/" << m.diffuse[1] << "/" << m.diffuse[2]
+                      << std::endl;
+            MaterialManager::getInstance().addMaterial(std::shared_ptr<Material>(
+                    new Material(m.name, Material::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]),
+                                 Material::Color(m.specular[0], m.specular[1], m.specular[2]), m.shininess)));
+        }
     }
 
     for (auto &object: objectShape) {
@@ -56,7 +61,7 @@ void Scene::draw(ShaderProgram &shaderProgram) {
     }
 
     for (auto &model: models) {
-        shaderProgram.setMatrixUniform4f("MVPMatrix", camera.getProjectionMatrix() * camera.getViewMatrix() * model->getObjectTransformationMatrix());
+        shaderProgram.setMatrixUniform4f("MVPMatrix", camera.getProjectionMatrix() * camera.getViewMatrix() * model->getModelMatrix());
         model->draw(shaderProgram);
     }
 
@@ -78,6 +83,10 @@ void Scene::rotateModelAroundAxis(int id, int axis, float angle) {
     }
 }
 
+void Scene::resetModelRotationAroundAxis(int id) {
+    models[id]->resetRotationMatrixAxis();
+}
+
 std::shared_ptr<GraphicsModel> Scene::getModelByName(std::string name) {
     for(auto &model: models) {
         if(model->getName() == name) {
@@ -86,5 +95,7 @@ std::shared_ptr<GraphicsModel> Scene::getModelByName(std::string name) {
     }
     return nullptr;
 }
+
+
 
 

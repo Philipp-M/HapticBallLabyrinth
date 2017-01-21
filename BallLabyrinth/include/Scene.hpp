@@ -21,13 +21,15 @@ private:
     Camera camera;
 
 public:
-    Scene(std::string &objFilePath, std::string &materialRefFolder);
+    Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFolder);
 
     void loadObjFile(std::string objFilePath, std::string &materialRefFolder);
 
     void draw(ShaderProgram &shader);
 
     void rotateModelAroundAxis(int id, int axis, float angle);
+
+    void resetModelRotationAroundAxis(int id);
 
     std::shared_ptr<GraphicsModel> getModelByName(std::string name);
 };

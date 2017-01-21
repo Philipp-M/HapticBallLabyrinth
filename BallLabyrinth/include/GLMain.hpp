@@ -13,12 +13,13 @@ private:
     GLuint vao;
     GLuint vbo;
 
-    std::string objFilePath, materialFolder;
+    std::vector<std::string> objFilePaths;
+    std::string materialFolder;
 
     void initializeGraphics(SDL_Window *window, SDL_GLContext &context);
 
 public:
-    GLMain(SDL_Window *window, SDL_GLContext &context, std::string objFilePath, std::string materialFolder);
+    GLMain(SDL_Window *window, SDL_GLContext &context, std::vector<std::string> &objFilePaths, std::string &materialFolder);
 
     ~GLMain();
 
@@ -29,6 +30,8 @@ public:
     void reshape(int width, int height);
 
     void rotateModelAroundAxis(int id, int axis, float angle);
+
+    void resetModelRotationAroundAxis(int id);
 
     const std::shared_ptr<Scene> &getScene() const;
 };

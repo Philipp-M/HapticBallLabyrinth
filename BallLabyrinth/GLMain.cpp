@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include "GLMain.hpp"
 
-GLMain::GLMain(SDL_Window *window, SDL_GLContext &context, std::string objFilePath,
-               std::string materialFolder) : objFilePath(objFilePath), materialFolder(materialFolder) {
+GLMain::GLMain(SDL_Window *window, SDL_GLContext &context, std::vector<std::string> &objFilePaths,
+               std::string &materialFolder) : objFilePaths(objFilePaths), materialFolder(materialFolder) {
     initializeGraphics(window, context);
 }
 
@@ -45,7 +45,9 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     /********** setup the drawing primitive **********/
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    scene.reset(new Scene(objFilePath, materialFolder));
+    scene.reset(new Scene(objFilePaths, materialFolder));
+
+    scene->getModelByName("Ball")->translate(glm::vec3(-13.0, 2.0, -13.0));
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -71,8 +73,13 @@ void GLMain::rotateModelAroundAxis(int id, int axis, float angle) {
     scene->rotateModelAroundAxis(id, axis, angle);
 }
 
+void GLMain::resetModelRotationAroundAxis(int id) {
+    scene->resetModelRotationAroundAxis(id);
+}
+
 const std::shared_ptr<Scene> &GLMain::getScene() const {
     return scene;
 }
+
 
 

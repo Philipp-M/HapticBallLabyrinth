@@ -50,8 +50,9 @@ void GraphicsModel::calculateVertexNormals() {
 }
 
 GraphicsModel::GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material) :
-        bufferObjectsLoaded(false), name(name), centroid(glm::vec3(0)), vertexData(mesh.positions.size() / 3),
-        material(material), objectTransformationMatrix(glm::mat4(1.0f)) {
+        name(name), centroid(glm::vec3(0)), vertexData(mesh.positions.size() / 3), material(material),
+        translationMatrix(glm::mat4(1.0f)), rotationMatrixAxis(glm::mat4(1.0f)),
+        rotationMatrixModelOrigin(glm::mat4(1.0f)), modelMatrix(1.0f) {
     computeVertices(mesh);
 
     std::cout << "Added model: " << name << " - number vertices: " << vertexData.size() << " - centroid: " << centroid.x << "/" << centroid.y << "/" << centroid.z << " - material: " << material->name << std::endl;
@@ -66,8 +67,8 @@ void GraphicsModel::draw(ShaderProgram &shaderProgram) {
     shaderProgram.vertexAttribPointer("normal", 3, GL_FLOAT, sizeof(Vertex), (void *) (sizeof(glm::vec3)), false);
 //  glEnableVertexAttribArray(shaderProgram.attributeLocation("texCoord"));
 //  shaderProgram.vertexAttribPointer("texCoord", 2, GL_FLOAT, sizeof(Vertex3), (void *) (3 * sizeof(glm::vec3)), false);
-    shaderProgram.setMatrixUniform4f("modelMatrix", objectTransformationMatrix);
-    shaderProgram.setMatrixUniform3f("normalMatrix", glm::transpose(glm::inverse(glm::mat3(objectTransformationMatrix))));
+    shaderProgram.setMatrixUniform4f("modelMatrix", getModelMatrix());
+    shaderProgram.setMatrixUniform3f("normalMatrix", glm::transpose(glm::inverse(glm::mat3(getModelMatrix()))));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
@@ -108,37 +109,57 @@ const std::shared_ptr<Material> &GraphicsModel::getMaterial() const {
     return material;
 }
 
-const glm::mat4 &GraphicsModel::getObjectTransformationMatrix() const {
-    return objectTransformationMatrix;
+const glm::mat4 &GraphicsModel::getModelMatrix() const {
+    return modelMatrix;
 }
 
+void GraphicsModel::updateModelMatrix() {
+    modelMatrix = rotationMatrixAxis * translationMatrix * rotationMatrixModelOrigin;
+}
+
+
 void GraphicsModel::rotateAroundAxisX(float angle) {
-    float cosA = std::cos(glm::radians(angle));
-    float sinA = std::sin(glm::radians(angle));
-    glm::mat4 rotationMatX(1.0, 0.0, 0.0, 0.0,
-                           0.0, cosA, -sinA, 0.0,
-                           0.0, sinA, cosA, 0.0,
-                           0.0, 0.0, 0.0, 1.0);
-    objectTransformationMatrix *= rotationMatX;
+//    float cosA = std::cos(glm::radians(angle));
+//    float sinA = std::sin(glm::radians(angle));
+//    glm::mat4 rotationMatX(1.0, 0.0, 0.0, 0.0,
+//                           0.0, cosA, -sinA, 0.0,
+//                           0.0, sinA, cosA, 0.0,
+//                           0.0, 0.0, 0.0, 1.0);
+//    rotationMatrixAxis *= rotationMatX;
+    rotationMatrixAxis *= glm::rotate(rotationMatrixAxis, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    updateModelMatrix();
 }
 
 void GraphicsModel::rotateAroundAxisZ(float angle) {
-    float cosA = std::cos(glm::radians(angle));
-    float sinA = std::sin(glm::radians(angle));
-    glm::mat4 rotationMatZ(cosA, -sinA, 0.0, 0.0,
-                           sinA, cosA, 0.0, 0.0,
-                           0.0, 0.0, 1.0, 0.0,
-                           0.0, 0.0, 0.0, 1.0);
-    objectTransformationMatrix *= rotationMatZ;
+//    float cosA = std::cos(glm::radians(angle));
+//    float sinA = std::sin(glm::radians(angle));
+//    glm::mat4 rotationMatZ(cosA, -sinA, 0.0, 0.0,
+//                           sinA, cosA, 0.0, 0.0,
+//                           0.0, 0.0, 1.0, 0.0,
+//                           0.0, 0.0, 0.0, 1.0);
+//    rotationMatrixAxis *= rotationMatZ;
+    rotationMatrixAxis *= glm::rotate(rotationMatrixAxis, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+    updateModelMatrix();
 }
 
 void GraphicsModel::translate(glm::vec3 translationVec) {
-    objectTransformationMatrix = glm::translate(objectTransformationMatrix, translationVec);
+    translationMatrix = glm::translate(translationMatrix, translationVec);
+    updateModelMatrix();
 }
 
-void GraphicsModel::setNewPosition(glm::vec3 centerpoint) {
-    centroid = centerpoint;
-    refreshBuffers();
+void GraphicsModel::resetRotationMatrixAxis() {
+    rotationMatrixAxis = glm::mat4(1.0);
+    updateModelMatrix();
+}
+
+void GraphicsModel::resetRotationMatrixModelOrigin() {
+    rotationMatrixModelOrigin = glm::mat4(1.0);
+    updateModelMatrix();
+}
+
+void GraphicsModel::resetTranslationMatrix() {
+    translationMatrix = glm::mat4(1.0);
+    updateModelMatrix();
 }
 
 

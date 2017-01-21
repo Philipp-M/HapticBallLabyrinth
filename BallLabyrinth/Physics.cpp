@@ -4,6 +4,8 @@
 
 #include "Physics.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
 
 Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight,
                                     float wallwidth) {
@@ -35,7 +37,7 @@ Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, floa
 }
 
 void Physics::Ball::calculateInverseInertiaTensor() {
-    inverseInertiaTensor = glm::mat3(1 / (2 / 5 * mass * radius * radius));
+    inverseInertiaTensor = glm::mat3(1.0 / (2.0 / 5.0 * mass * radius * radius));
 }
 
 Physics::Collision Physics::Ball::collisionCheck(const Physics::StaticObject &wall) {
@@ -62,36 +64,37 @@ void Physics::Ball::resetPosition(Physics::Collision &collision) {
 }
 
 void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
-//    glm::vec3 rBall = -collision.collisionNormal * radius;
+//    float j = -(collisionEpsilon + 1) * glm::dot(velocity, collision.collisionNormal);
+//    j /= glm::dot(collision.collisionNormal, collision.collisionNormal) * (1.0 / mass);
+//    velocity += j * collision.collisionNormal / mass;
+
+//    auto rBall = -collision.collisionNormal * radius;
 //
-//    float j = (-(collisionEpsilon + 1) * glm::dot(velocity, collision.collisionNormal))
-//              / ((1.0 / mass) * (glm::dot(collision.collisionNormal, collision.collisionNormal)
-//                                 + glm::dot(
-//            glm::cross(glm::cross(inverseInertiaTensor * rBall, collision.collisionNormal), rBall),
-//            collision.collisionNormal)));
+//    float numerator = -(collisionEpsilon + 1.0f) * glm::dot(velocity, collision.collisionNormal);
+//    float denominator = (1.0f / mass) * glm::dot(collision.collisionNormal, collision.collisionNormal)
+//                     + glm::dot(glm::cross(glm::cross(inverseInertiaTensor * rBall, collision.collisionNormal), rBall), collision.collisionNormal);
+//
+//    float j = numerator/denominator;
 //    velocity += j * collision.collisionNormal / mass;
 //    omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
-
-    float j = -(collisionEpsilon+1)*glm::dot(velocity,collision.collisionNormal);
-          j /= glm::dot(collision.collisionNormal,collision.collisionNormal)*(1.0/mass);
-    velocity += j * collision.collisionNormal / mass;
-//    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
+    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
 }
 
 void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     // Total force calculation
     force = earthAcceleration * mass;
+    std::cout << glm::to_string(force) << std::endl;
 
     // Total torque calculation
+
+    // Update velocity
+    velocity += dt * force / mass;
 
     // Update position and linear velocity
     oldCenterpoint = centerpoint;
     centerpoint += dt * velocity;
 
-//    std::cout << centerpoint.x << "/" << centerpoint.y << "/" << centerpoint.z << std::endl;
-
-    // Update velocity
-    velocity += dt * force / mass;
+    std::cout << centerpoint.x << "/" << centerpoint.y << "/" << centerpoint.z << std::endl;
 
     // Update rotation matrix
     rotation += dt * glm::matrixCross3(omega) * rotation;
@@ -106,35 +109,27 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     // Update angular velocity
     omega = inverseInertiaTensor * angularMomentum;
 
-    velocity *= 1.0 - dt/1.0;
+    velocity *= 1.0 - dt / 1.0;
 
     force.x = 0.0;
     force.y = 0.0;
     force.z = 0.0;
 }
 
-void Physics::Ball::updateGraphicsModel(float pitch, float yaw) {
-    glm::vec3 transVec = centerpoint;
-    glm::vec3 helperVec = oldCenterpoint;
+void Physics::Ball::updateGraphicsModel() {
 
-    glm::rotateX(helperVec, glm::radians(pitch));
-    glm::rotateY(helperVec, glm::radians(yaw));
-
-    glm::rotateX(transVec, glm::radians(pitch));
-    glm::rotateY(transVec, glm::radians(yaw));
-
-    transVec -= helperVec;
-
+    glm::vec3 graphicCenter = centerpoint;
     // Calculate centerpoint for graphics model
-    float tmp = transVec.z;
-    transVec.z = transVec.y;
-    transVec.y = tmp;
+    float tmp = graphicCenter.z;
+    graphicCenter.z = graphicCenter.y;
+    graphicCenter.y = tmp;
 
-    graphicsModel->translate(transVec);
+    graphicsModel->resetTranslationMatrix();
+    graphicsModel->translate(graphicCenter);
 }
 
 Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
-                                         yaw(0.0) {
+                             yaw(0.0) {
 }
 
 void Physics::addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon) {
@@ -153,7 +148,7 @@ void Physics::addWalls(std::string file) {
             std::istringstream in(line);
             if (linecount == 1) {
                 in >> wallheight >> floorheight >> wallwidth; //h f t
-            } else if(linecount == 2) {
+            } else if (linecount == 2) {
                 in >> startx >> starty >> widthx >> widthy;
             } else {
                 float x1, y1, x2, y2;
@@ -163,22 +158,17 @@ void Physics::addWalls(std::string file) {
         }
         myfile.close();
 
-        walls.push_back(StaticObject(startx, starty, startx+widthx, starty, 0.0, floorheight, widthy));
+        walls.push_back(StaticObject(startx, starty, startx + widthx, starty, 0.0, floorheight, widthy));
         std::cout << "walls loaded: " << walls.size() << std::endl;
     }
 }
 
-void Physics::rotateEarthAccelerationX(float pitch) {
+void Physics::rotateEarthAccelerationXY(float pitch, float yaw) {
     lock.lock();
-    this->pitch += pitch;
-    earthAcceleration = glm::rotateX(earthAcceleration, glm::radians(-pitch));
-    lock.unlock();
-}
-
-void Physics::rotateEarthAccelerationY(float yaw) {
-    lock.lock();
-    this->yaw += yaw;
-    earthAcceleration = glm::rotateY(earthAcceleration, glm::radians(-yaw));
+    this->pitch = pitch;
+    earthAcceleration = glm::rotateX(glm::vec3(0.0, 0.0, -EARTH_ACCEL), glm::radians(pitch));
+    this->yaw = yaw;
+    earthAcceleration = glm::rotateY(earthAcceleration, glm::radians(yaw));
     lock.unlock();
 }
 
@@ -198,14 +188,15 @@ void Physics::handleCollisions() {
 void Physics::update() {
     auto elapseTime = std::chrono::high_resolution_clock::now();
 
-    while(!quit) {
+    while (!quit) {
         std::this_thread::sleep_for(dt);
-        dtElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - elapseTime).count() / 1000.0f;
+        dtElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::high_resolution_clock::now() - elapseTime).count() / 1000.0f;
         elapseTime = std::chrono::high_resolution_clock::now();
         handleCollisions();
         lock.lock();
         ballObjects[0].updatePhysics(dtElapsed, earthAcceleration);
-        ballObjects[0].updateGraphicsModel(pitch, yaw);
+        ballObjects[0].updateGraphicsModel();
         lock.unlock();
     }
 }

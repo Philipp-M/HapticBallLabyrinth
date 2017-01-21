@@ -2,6 +2,7 @@
 #pragma once
 
 #define GLM_FORCE_RADIANS
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <memory>
@@ -11,38 +12,42 @@
 
 class GraphicsModel {
 public:
-	struct Vertex {
-		Vertex(const glm::vec3 &vertex = glm::vec3(), const glm::vec3 &normal = glm::vec3(), const glm::vec2 &textureCoordinate = glm::vec2()) :
-				vertex(vertex), normal(normal), textureCoordinate(textureCoordinate)
-		{}
+    struct Vertex {
+        Vertex(const glm::vec3 &vertex = glm::vec3(), const glm::vec3 &normal = glm::vec3(),
+               const glm::vec2 &textureCoordinate = glm::vec2()) :
+                vertex(vertex), normal(normal), textureCoordinate(textureCoordinate) {}
 
-		glm::vec3 vertex;
-		glm::vec3 normal;
-		glm::vec2 textureCoordinate;
-	};
+        glm::vec3 vertex;
+        glm::vec3 normal;
+        glm::vec2 textureCoordinate;
+    };
 
 private:
-	GLuint vbo;
-	GLuint ibo;
+    GLuint vbo;
+    GLuint ibo;
 
-	bool bufferObjectsLoaded;
-
-	std::string name;
-	std::vector<GraphicsModel::Vertex> vertexData;
-	std::vector<GLuint> indexData;
-	glm::vec3 centroid;
+    std::string name;
+    std::vector<GraphicsModel::Vertex> vertexData;
+    std::vector<GLuint> indexData;
+    glm::vec3 centroid;
     std::shared_ptr<Material> material;
-	glm::mat4 objectTransformationMatrix;
+    glm::mat4 translationMatrix;
+    glm::mat4 rotationMatrixAxis;
+    glm::mat4 rotationMatrixModelOrigin;
+    glm::mat4 modelMatrix;
 
-	void computeVertices(tinyobj::mesh_t &mesh);
-	void calculateVertexNormals();
+    void computeVertices(tinyobj::mesh_t &mesh);
+
+    void calculateVertexNormals();
+
+    void updateModelMatrix();
 
 public:
-	GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material = nullptr);
+    GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material = nullptr);
 
-	void draw(ShaderProgram &shaderProgram);
+    void draw(ShaderProgram &shaderProgram);
 
-	void refreshBuffers();
+    void refreshBuffers();
 
     const std::string &getName() const;
 
@@ -50,15 +55,19 @@ public:
 
     const std::shared_ptr<Material> &getMaterial() const;
 
-    const glm::mat4 &getObjectTransformationMatrix() const;
+    const glm::mat4 &getModelMatrix() const;
 
-	void rotateAroundAxisX(float angle);
+    void rotateAroundAxisX(float angle);
 
     void rotateAroundAxisZ(float angle);
 
-	void translate(glm::vec3 translationVec);
+    void translate(glm::vec3 translationVec);
 
-	void setNewPosition(glm::vec3 centerpoint);
+    void resetRotationMatrixAxis();
+
+    void resetRotationMatrixModelOrigin();
+
+    void resetTranslationMatrix();
 };
 
 

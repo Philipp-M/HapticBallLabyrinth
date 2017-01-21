@@ -23,7 +23,7 @@
 
 #include "GraphicsModel.hpp"
 
-#define EARTH_ACCEL 9810
+#define EARTH_ACCEL 98.10
 
 static std::mutex lock;
 
@@ -62,9 +62,14 @@ public:
         glm::vec3 force;
 
         Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius, float collisionEpsilon) :
-                graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon), centerpoint(model->getCentroid().x, model->getCentroid().z, model->getCentroid().y), velocity(0.0),
+                graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon), velocity(0.0),
                 angularMomentum(0.0), omega(0.0), rotation(1.0), torque(0.0), force(0.0, 0.0, 0.0) {
             calculateInverseInertiaTensor();
+            glm::vec4 tmp = model->getModelMatrix() * glm::vec4(model->getCentroid(), 1.0);
+
+            centerpoint.x = tmp.x;
+            centerpoint.y = tmp.z;
+            centerpoint.z = tmp.y;
         }
 
         void calculateInverseInertiaTensor();
@@ -77,7 +82,7 @@ public:
 
         void updatePhysics(float dt, glm::vec3 earthAcceleration);
 
-        void updateGraphicsModel(float pitch, float yaw);
+        void updateGraphicsModel();
     };
 
 
@@ -97,8 +102,7 @@ public:
 
     void addWalls(std::string file);
 
-    void rotateEarthAccelerationX(float pitch);
-    void rotateEarthAccelerationY(float yaw);
+    void rotateEarthAccelerationXY(float pitch, float yaw);
 
     void handleCollisions();
 
