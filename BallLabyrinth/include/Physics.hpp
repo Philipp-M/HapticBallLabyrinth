@@ -16,29 +16,43 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cmath>
 
 #define EARTH_ACCEL 9.81
 
 class Physics {
 public:
-    struct StaticObject {
-        glm::vec3 edgepoint1, edgepoint2;
-        glm::vec3 normals
+    struct StaticObject { //AABB box according to: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+        glm::vec3 edgepointmin, edgepointmax;
 
         StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight, float wallwidth) {
-            edgepoint1.x = x1;
-            edgepoint1.y = y1;
-            edgepoint1.z = floorheight;
 
             if (y1 == y2) {
-                edgepoint2.x = x2;
-                edgepoint2.y = y2 + wallwidth;
+                if(x1>x2) {
+                    edgepointmin.x = x2;
+                    edgepointmax.x = x1;
+                } else {
+                    edgepointmin.x = x1;
+                    edgepointmax.x = x2;
+                }
+
+                edgepointmin.y = y1;
+                edgepointmax.y = y1 + wallwidth;
             }
             else if (x1 == x2) {
-                edgepoint2.x = x2 + wallwidth;
-                edgepoint2.y = y2;
+                if(y1>y2) {
+                    edgepointmin.y = y2;
+                    edgepointmax.y = y1;
+                } else {
+                    edgepointmin.y = y1;
+                    edgepointmax.y = y2;
+                }
+
+                edgepointmin.x = x1;
+                edgepointmax.x = x1 + wallwidth;
             }
-            edgepoint2.z = floorheight+wallheight;
+            edgepointmin.z = floorheight;
+            edgepointmax.z = floorheight+wallheight;
         }
     };
 
@@ -78,6 +92,7 @@ private:
     float dt;
     std::vector<Ball> ballObjects;
     std::vector<StaticObject> walls;
+
     void loadwalls(std::string file) {
         std::string line;
         int linecount=0;
@@ -100,6 +115,21 @@ private:
             myfile.close();
         }
     }
+
+    float getdistancefromAABB(StaticObject aabb, glm::vec3 point) {
+        // get box closest point to sphere center by clamping
+        float x = std::max(aabb.edgepointmin.x, std::min(point.x, aabb.edgepointmax.x));
+        float y = std::max(aabb.edgepointmin.y, std::min(point.y, aabb.edgepointmax.y));
+        float z = std::max(aabb.edgepointmin.z, std::min(point.z, aabb.edgepointmax.z));
+
+        // distance between point and boundingbox
+        float distance = std::sqrt((x - point.x) * (x - point.x) +
+                                 (y - point.y) * (y - point.y) +
+                                 (z - point.z) * (z - point.z));
+
+        return distance;
+    }
+
 public:
     Physics(double time = 0.0, double dt = 0.001);
 
