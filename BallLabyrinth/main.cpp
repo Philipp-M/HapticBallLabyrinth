@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <thread>
 #include "Physics.hpp"
 #include "ShaderProgram.hpp"
 #include "GLMain.hpp"
@@ -42,7 +43,7 @@ int main(int argc, char *argv[]) {
     GLMain glMain(mainwindow, maincontext, OBJFILEPATH, MATERIALFOLDER);
     SDL_Event event;
 
-    Physics physics(0.0, 0.001);
+    Physics physics(0.01);
     physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0, 1.0);
     physics.addWalls(COLLISIONGEOMETRYPATH);
 
@@ -55,6 +56,8 @@ int main(int argc, char *argv[]) {
 
     unsigned int startTime = SDL_GetTicks();
     unsigned int frames = 0;
+
+    std::thread physicsThread(&Physics::update, std::ref(physics));
 
     while (!quit) {
         glMain.display();
@@ -160,9 +163,12 @@ int main(int argc, char *argv[]) {
         } else {
             frames++;
         }
-
-        physics.update();
     }
+
+    physics.quitPhysics();
+
+    physicsThread.join();
+
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     SDL_GL_DeleteContext(maincontext);
     SDL_DestroyWindow(mainwindow);

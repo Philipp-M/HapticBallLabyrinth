@@ -5,6 +5,14 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <cmath>
+#include <thread>
+#include <mutex>
+#include <chrono>
 
 #define GLM_FORCE_RADIANS
 
@@ -12,14 +20,12 @@
 #include <glm/gtx/matrix_cross_product.hpp>
 #include <glm/gtx/orthonormalize.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+
 #include "GraphicsModel.hpp"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <cmath>
 
 #define EARTH_ACCEL 9.81
+
+static std::mutex lock;
 
 class Physics {
 public:
@@ -76,15 +82,16 @@ public:
 
 
 private:
-    float time;
-    float dt;
+    std::chrono::duration<float> dt;
+    float dtElapsed;
+    bool quit;
     glm::vec3 earthAcceleration;
     float pitch, yaw;
     std::vector<Ball> ballObjects;
     std::vector<StaticObject> walls;
 
 public:
-    Physics(float time = 0.0, float dt = 0.001);
+    Physics(float dt = 0.001);
 
     void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon);
 
@@ -97,6 +104,8 @@ public:
     void handleCollisions();
 
     void update();
+
+    void quitPhysics();
 };
 
 

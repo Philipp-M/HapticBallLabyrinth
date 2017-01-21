@@ -126,12 +126,10 @@ void Physics::Ball::updateGraphicsModel(float pitch, float yaw) {
     transVec.z = transVec.y;
     transVec.y = tmp;
 
-    transVec *= 100.0;
-
     graphicsModel->translate(transVec);
 }
 
-Physics::Physics(float time, float dt) : time(time), dt(dt), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
+Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
                                          yaw(0.0) {
 }
 
@@ -163,15 +161,17 @@ void Physics::addWalls(std::string file) {
 }
 
 void Physics::rotateEarthAccelerationX(float pitch) {
+    lock.lock();
     this->pitch += pitch;
     earthAcceleration = glm::rotateX(earthAcceleration, glm::radians(-pitch));
-
+    lock.unlock();
 }
 
 void Physics::rotateEarthAccelerationY(float yaw) {
+    lock.lock();
     this->yaw += yaw;
     earthAcceleration = glm::rotateY(earthAcceleration, glm::radians(-yaw));
-
+    lock.unlock();
 }
 
 void Physics::handleCollisions() {
@@ -180,21 +180,30 @@ void Physics::handleCollisions() {
     for (auto &wall: walls) {
         collision = ball.collisionCheck(wall);
         if (collision.collision) {
-            std::cout << "velocity before collision: " << ball.velocity.x << " " << ball.velocity.y << " " << ball.velocity.z << std::endl;
-//            std::cout << "collision normal: " << collision.collisionNormal.x << " " << collision.collisionNormal.y << " " << collision.collisionNormal.z << std::endl;
-            std::cout << "distance: " << collision.distance << std::endl;
-            std::cout << "position before reset: " << ball.centerpoint.x << " " << ball.centerpoint.y << " " << ball.centerpoint.z << std::endl;
             ballObjects[0].resetPosition(collision);
-            std::cout << "position after reset: " << ball.centerpoint.x << " " << ball.centerpoint.y << " " << ball.centerpoint.z << std::endl;
             ballObjects[0].updateCollisionImpulse(collision);
-            std::cout << "velocity after collision: " << ball.velocity.x << " " << ball.velocity.y << " " << ball.velocity.z << std::endl;
         }
     }
 }
 
 void Physics::update() {
-    handleCollisions();
-    ballObjects[0].updatePhysics(dt, earthAcceleration);
-    ballObjects[0].updateGraphicsModel(pitch, yaw);
+    auto elapseTime = std::chrono::high_resolution_clock::now();
+
+    while(!quit) {
+        std::this_thread::sleep_for(dt);
+        dtElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - elapseTime).count() / 1000.0f;
+        elapseTime = std::chrono::high_resolution_clock::now();
+        handleCollisions();
+        lock.lock();
+        ballObjects[0].updatePhysics(dtElapsed, earthAcceleration);
+        ballObjects[0].updateGraphicsModel(pitch, yaw);
+        lock.unlock();
+    }
+}
+
+void Physics::quitPhysics() {
+    lock.lock();
+    quit = true;
+    lock.unlock();
 }
 
