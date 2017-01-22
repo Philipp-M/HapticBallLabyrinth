@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]) {
 	std::string filename = "scenes/cornell8.obj";
 	std::string path = "scenes/";
-	Scene scene(filename, path);
+//	Scene scene(filename, path);
 
 	return 0;
 }

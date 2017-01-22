@@ -1,0 +1,10 @@
+#!/bin/bash
+
+rm Labyrinth*
+python maze.py > Labyrinth.scad
+openscad -o Labyrinth.stl Labyrinth.scad
+blender --background --python convert_stl_to_blend.py -- Labyrinth.stl Labyrinth.obj
+cat Labyrinth.obj | sed -e "s/usemtl None/usemtl Woodlabyrinth/" > Labyrinthtemp.obj
+cat Labyrinthtemp.obj | sed -e "s/mtllib Labyrinth.mtl/mtllib LabyrinthandBallblend.mtl/" > Labyrinthtemp1.obj
+cp Labyrinthtemp1.obj ../scenes/Labyrinth.obj
+mv walloutput.txt ../scenes/

@@ -8,10 +8,10 @@ Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, floa
     if (y1 == y2) {
         if (x1 > x2) {
             edgepointMin.x = x2;
-            edgepointMax.x = x1;
+            edgepointMax.x = x1+wallwidth;
         } else {
             edgepointMin.x = x1;
-            edgepointMax.x = x2;
+            edgepointMax.x = x2+wallwidth;
         }
 
         edgepointMin.y = y1;
@@ -19,10 +19,10 @@ Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, floa
     } else if (x1 == x2) {
         if (y1 > y2) {
             edgepointMin.y = y2;
-            edgepointMax.y = y1;
+            edgepointMax.y = y1+wallwidth;
         } else {
             edgepointMin.y = y1;
-            edgepointMax.y = y2;
+            edgepointMax.y = y2+wallwidth;
         }
 
         edgepointMin.x = x1;
@@ -83,7 +83,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     // Total torque calculation
 
     // Update velocity
-    velocity += dt * force / mass;
+    velocity += dt * force * 0.7f / mass; // 0.7 factor from the solid sphere inertial tensor
 
     // Update position and linear velocity
     centerpoint += dt * velocity;

@@ -44,7 +44,7 @@ import array
 import random
 import math
 
-DEFAULT_HEIGHT          =  5.0
+DEFAULT_HEIGHT          =  3.0
 DEFAULT_LENGTH          = 30.0
 DEFAULT_WIDTH           = 30.0
 DEFAULT_FLOOR_THICKNESS =  1.0
@@ -145,7 +145,7 @@ class Maze:
 		if self.f is None:
 			self.f = sys.stdout
 		self.f1 = open( "walloutput.txt", 'w' )
-		self.f1.write('%f %f %f\n' % (float(h), float(f), float(t)) )
+		self.f1.write('%f %f %f\n' % (float(h), float(f), float(t*(self.width/(self.wall_thickness + 2 * self.w)))) )
 		self.f1.write('%f %f %f %f\n' % (float(-w/2), float(-l/2), float(w), float(l)) )
 
 		# The large mazes tend to hit the recursion limit
@@ -368,7 +368,7 @@ class Maze:
 		scaley = (self.length/(self.wall_thickness + 2 * self.h))
 		xoffset = -self.width/2
 		yoffset = -self.length/2
-		self.f1.write('%d %d %d %d\n' % (x1*scalex+xoffset, y1*scaley+yoffset, x2*scalex+xoffset, y2*scaley+yoffset) )
+		self.f1.write('%f %f %f %f\n' % (x1*scalex+xoffset, y1*scaley+yoffset, x2*scalex+xoffset, y2*scaley+yoffset) )
 
 	def draw_wall( self, x, y, d ):
 
