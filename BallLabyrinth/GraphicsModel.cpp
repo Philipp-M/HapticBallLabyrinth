@@ -56,7 +56,7 @@ GraphicsModel::GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shar
     computeVertices(mesh);
 
     std::cout << "Added model: " << name << " - number vertices: " << vertexData.size() << " - centroid: " << centroid.x << "/" << centroid.y << "/" << centroid.z << " - material: " << material->name << std::endl;
-    refreshBuffers();
+    initializeBuffers();
 }
 
 void GraphicsModel::draw(ShaderProgram &shaderProgram) {
@@ -83,18 +83,13 @@ void GraphicsModel::draw(ShaderProgram &shaderProgram) {
     glDrawElements(GL_TRIANGLES, (GLsizei) (size / sizeof(GLuint)), GL_UNSIGNED_INT, 0);
 }
 
-void GraphicsModel::refreshBuffers() {
-    /*if (bufferObjectsLoaded) {
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ibo);
-    }*/
+void GraphicsModel::initializeBuffers() {
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), &vertexData[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.size() * sizeof(GLint), &indexData[0], GL_STATIC_DRAW);
-    //bufferObjectsLoaded = true;
 }
 
 const std::string &GraphicsModel::getName() const {
@@ -142,12 +137,16 @@ void GraphicsModel::rotateAroundAxisZ(float angle) {
     updateModelMatrix();
 }
 
-void GraphicsModel::translate(glm::vec3 translationVec) {
+void GraphicsModel::rotateAroundModelOrigin(glm::mat4 &rotationMat) {
+    rotationMatrixModelOrigin *= rotationMat;
+}
+
+void GraphicsModel::translate(glm::vec3 &translationVec) {
     translationMatrix = glm::translate(translationMatrix, translationVec);
     updateModelMatrix();
 }
 
-void GraphicsModel::mirror(glm::vec4 axis) {
+void GraphicsModel::mirror(glm::vec4 &axis) {
     translationMatrix *= axis;
 }
 
@@ -165,6 +164,7 @@ void GraphicsModel::resetTranslationMatrix() {
     translationMatrix = glm::mat4(1.0);
     updateModelMatrix();
 }
+
 
 
 

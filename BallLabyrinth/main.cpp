@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
     std::thread physicsThread(&Physics::update, std::ref(physics));
 
     while (!quit) {
+        physics.updateGraphicsModel();
         glMain.display();
         SDL_GL_SwapWindow(mainwindow);
 

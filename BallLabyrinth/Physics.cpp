@@ -1,7 +1,3 @@
-//
-// Created by steve on 1/18/17.
-//
-
 #include "Physics.hpp"
 
 #include <glm/gtx/string_cast.hpp>
@@ -83,7 +79,6 @@ void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
 void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     // Total force calculation
     force = earthAcceleration * mass;
-    std::cout << glm::to_string(force) << std::endl;
 
     // Total torque calculation
 
@@ -91,10 +86,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     velocity += dt * force / mass;
 
     // Update position and linear velocity
-    oldCenterpoint = centerpoint;
     centerpoint += dt * velocity;
-
-    std::cout << centerpoint.x << "/" << centerpoint.y << "/" << centerpoint.z << std::endl;
 
     // Update rotation matrix
     rotation += dt * glm::matrixCross3(omega) * rotation;
@@ -118,14 +110,26 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 
 void Physics::Ball::updateGraphicsModel() {
 
-    glm::vec3 graphicCenter = centerpoint;
     // Calculate centerpoint for graphics model
+    glm::vec3 graphicCenter = centerpoint;
     float tmp = graphicCenter.z;
     graphicCenter.z = graphicCenter.y;
     graphicCenter.y = tmp;
 
+    // Update translation matrix of graphicsModel
     graphicsModel->resetTranslationMatrix();
     graphicsModel->translate(graphicCenter);
+
+//    // Calculate rotation of graphicsModel
+//    glm::mat4 graphicsModelRotation(rotation);
+//    graphicsModelRotation *= glm::mat4(1.0, 0.0, 0.0, 0.0,
+//                                       0.0, 0.0, 1.0, 0.0,
+//                                       0.0, 1.0, 0.0, 0.0,
+//                                       0.0, 0.0, 0.0, 1.0);
+//
+//    // Update rotation matrix around origin of graphicsModel
+//    graphicsModel->resetRotationMatrixModelOrigin();
+//    graphicsModel->rotateAroundModelOrigin(graphicsModelRotation);
 }
 
 Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
@@ -196,7 +200,7 @@ void Physics::update() {
         handleCollisions();
         lock.lock();
         ballObjects[0].updatePhysics(dtElapsed, earthAcceleration);
-        ballObjects[0].updateGraphicsModel();
+//        ballObjects[0].updateGraphicsModel();
         lock.unlock();
     }
 }
@@ -204,6 +208,12 @@ void Physics::update() {
 void Physics::quitPhysics() {
     lock.lock();
     quit = true;
+    lock.unlock();
+}
+
+void Physics::updateGraphicsModel() {
+    lock.lock();
+    ballObjects[0].updateGraphicsModel();
     lock.unlock();
 }
 

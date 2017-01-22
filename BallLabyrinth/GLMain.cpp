@@ -47,8 +47,11 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     glBindVertexArray(vao);
     scene.reset(new Scene(objFilePaths, materialFolder));
 
-    scene->getModelByName("Ball")->translate(glm::vec3(-13.0, 2.0, -13.0));
-    scene->getModelByName("Labyrinth")->mirror(glm::vec4(1.0, 1.0, -1.0, 1.0));
+    /********** setup the initial translation for the ball **********/
+    glm::vec3 initTranslation(-13.0, 2.0, -13.0);
+    scene->getModelByName("Ball")->translate(initTranslation);
+    glm::vec4 mirrorAxis(1.0, 1.0, -1.0, 1.0);
+    scene->getModelByName("Labyrinth")->mirror(mirrorAxis);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
