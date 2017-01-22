@@ -84,6 +84,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 
     // Update velocity
     velocity += dt * force * 0.7f / mass; // 0.7 factor from the solid sphere inertial tensor
+    velocity += dt * velocity * earthAcceleration.z * 0.002f; // friction term
 
     // Update position and linear velocity
     centerpoint += dt * velocity;
@@ -92,6 +93,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     rotation += dt * glm::matrixCross3(omega) * rotation;
     rotation = glm::orthonormalize(rotation);
 
+    std::cout << "rotation: " << glm::to_string(rotation) << std::endl;
     // Update angular momentum
     angularMomentum += dt * torque;
 
@@ -101,7 +103,6 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     // Update angular velocity
     omega = inverseInertiaTensor * angularMomentum;
 
-    velocity *= 1.0 - dt / 1.0;
 
     force.x = 0.0;
     force.y = 0.0;
