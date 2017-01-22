@@ -147,6 +147,10 @@ void GraphicsModel::translate(glm::vec3 translationVec) {
     updateModelMatrix();
 }
 
+void GraphicsModel::mirror(glm::vec4 axis) {
+    translationMatrix *= axis;
+}
+
 void GraphicsModel::resetRotationMatrixAxis() {
     rotationMatrixAxis = glm::mat4(1.0);
     updateModelMatrix();

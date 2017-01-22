@@ -44,8 +44,6 @@ set(SOURCE_FILES Shader.cpp
 
 add_executable(BallLabyrinth main.cpp ${SOURCE_FILES})
 
-add_executable(testScene testMain.cpp ${SOURCE_FILES})
-
 target_include_directories(BallLabyrinth PUBLIC
         include
         ${GLM_INCLUDE_DIR}
@@ -54,20 +52,6 @@ target_include_directories(BallLabyrinth PUBLIC
         ${SDL2_INCLUDE_DIR})
 
 target_link_libraries(BallLabyrinth
-        ${OPENGL_LIBRARIES}
-        ${GLUT_LIBRARY}
-        ${GLEW_LIBRARIES}
-        ${SDL2_LIBRARY}
-        ${SDL2_IMAGE_LIBRARY})
-
-target_include_directories(testScene PUBLIC
-        include
-        ${GLM_INCLUDE_DIR}
-        ${GLEW_INCLUDE_DIRS}
-        ${OpenGL_INCLUDE_DIRS}
-        ${SDL2_INCLUDE_DIR})
-
-target_link_libraries(testScene
         ${OPENGL_LIBRARIES}
         ${GLUT_LIBRARY}
         ${GLEW_LIBRARIES}

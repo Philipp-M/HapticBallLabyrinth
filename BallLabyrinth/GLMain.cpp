@@ -48,6 +48,7 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     scene.reset(new Scene(objFilePaths, materialFolder));
 
     scene->getModelByName("Ball")->translate(glm::vec3(-13.0, 2.0, -13.0));
+    scene->getModelByName("Labyrinth")->mirror(glm::vec4(1.0, 1.0, -1.0, 1.0));
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

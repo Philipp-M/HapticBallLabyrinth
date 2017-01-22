@@ -63,6 +63,8 @@ public:
 
     void translate(glm::vec3 translationVec);
 
+    void mirror(glm::vec4 axis);
+
     void resetRotationMatrixAxis();
 
     void resetRotationMatrixModelOrigin();

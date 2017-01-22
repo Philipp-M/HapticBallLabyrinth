@@ -68,16 +68,16 @@ void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
 //    j /= glm::dot(collision.collisionNormal, collision.collisionNormal) * (1.0 / mass);
 //    velocity += j * collision.collisionNormal / mass;
 
-//    auto rBall = -collision.collisionNormal * radius;
-//
-//    float numerator = -(collisionEpsilon + 1.0f) * glm::dot(velocity, collision.collisionNormal);
-//    float denominator = (1.0f / mass) * glm::dot(collision.collisionNormal, collision.collisionNormal)
-//                     + glm::dot(glm::cross(glm::cross(inverseInertiaTensor * rBall, collision.collisionNormal), rBall), collision.collisionNormal);
-//
-//    float j = numerator/denominator;
-//    velocity += j * collision.collisionNormal / mass;
-//    omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
-    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
+    auto rBall = -collision.collisionNormal * radius;
+
+    float numerator = -(collisionEpsilon + 1.0f) * glm::dot(velocity, collision.collisionNormal);
+    float denominator = (1.0f / mass) * glm::dot(collision.collisionNormal, collision.collisionNormal)
+                     + glm::dot(glm::cross(glm::cross(inverseInertiaTensor * rBall, collision.collisionNormal), rBall), collision.collisionNormal);
+
+    float j = numerator/denominator;
+    velocity += j * collision.collisionNormal / mass;
+    omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
+//    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
 }
 
 void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
