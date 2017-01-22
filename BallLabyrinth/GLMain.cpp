@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <iostream>
-#include <stdlib.h>
 #include "GLMain.hpp"
 
 GLMain::GLMain(SDL_Window *window, SDL_GLContext &context, std::vector<std::string> &objFilePaths,

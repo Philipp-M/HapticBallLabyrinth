@@ -86,8 +86,9 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 //                earthAcceleration.x * earthAcceleration.x + earthAcceleration.y * earthAcceleration.y +
 //                earthAcceleration.z * earthAcceleration.z));
 //        angle = std::acos(angle);
-//        std::cout << "angle: " << angle << std::endl;
 //        torque = (2.0f / 7.0f * mass * radius * std::sin(angle)) * earthAcceleration;
+//    } else {
+//        torque = glm::vec3(0.0, 0.0, 0.0);
 //    }
 
     // Update velocity
@@ -117,7 +118,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 //        omega.z = 0.0;
 //    }
 
-    // Simple calculations to let the ball roll, is just used for update of visual model.
+    // Simple calculations to let the ball roll, is just used for update of visual model. It is not used for the physics.
     if (velocity.x < -0.0001 || velocity.x > 0.0001 || velocity.y < -0.0001 || velocity.y > 0.0001) {
         // omegaSimple = velocity / radius
         glm::vec3 omegaSimple = velocity / radius;
@@ -159,6 +160,7 @@ void Physics::Ball::updateGraphicsModel() {
 //    graphicsModel->resetRotationMatrixModelOrigin();
 //    graphicsModel->rotateAroundModelOrigin(graphicsModelRotation);
 
+    // Update rotation of graphics model according to simple calculation of rotation depending on velocity
     if (velocity.x < -0.0001 || velocity.x > 0.0001 || velocity.y < -0.0001 || velocity.y > 0.0001) {
         glm::mat4 graphicsModelRotation = glm::rotate(glm::mat4(1.0), rotationAngleSimple, rotationAxisSimple);
         graphicsModel->rotateAroundModelOrigin(graphicsModelRotation);

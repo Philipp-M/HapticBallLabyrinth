@@ -4,17 +4,21 @@
 #include <SDL2/SDL.h>
 #include <thread>
 #include "Physics.hpp"
-#include "ShaderProgram.hpp"
 #include "GLMain.hpp"
 
 #define PROGRAM_NAME "Ball Labyrinth"
 
-#define OBJFILEPATHLABYRINTH "scenes/Labyrinth.obj"
-#define OBJFILEPATHBALL "scenes/Ballrough.obj"
-#define MATERIALFOLDER "scenes/"
-#define COLLISIONGEOMETRYPATH "scenes/walloutput.txt"
+#define OBJ_FILE_PATH_LABYRINTH "scenes/Labyrinth.obj"
+#define OBJ_FILE_PATH_BALL "scenes/Ballrough.obj"
+#define MATERIAL_FOLDER "scenes/"
+#define COLLISION_GEOMETRY_PATH "scenes/walloutput.txt"
 
-#define MAXROTATION 10
+#define MAX_ROTATION 5
+
+#define DELTA_TIME 0.01
+#define BALL_MASS 0.01
+#define BALL_RADIUS 1.0
+#define BALL_EPSILON 0.8
 
 int main(int argc, char *argv[]) {
 
@@ -42,14 +46,14 @@ int main(int argc, char *argv[]) {
 
     bool quit = false;
 
-    std::vector<std::string> objFilePaths = {OBJFILEPATHLABYRINTH, OBJFILEPATHBALL};
-    std::string materialFolder = MATERIALFOLDER;
+    std::vector<std::string> objFilePaths = {OBJ_FILE_PATH_LABYRINTH, OBJ_FILE_PATH_BALL};
+    std::string materialFolder = MATERIAL_FOLDER;
     GLMain glMain(mainwindow, maincontext, objFilePaths, materialFolder);
     SDL_Event event;
 
-    Physics physics(0.01);
-    physics.addBall(glMain.getScene()->getModelByName("Ball"), 0.01, 1.0, 0.5);
-    physics.addWalls(COLLISIONGEOMETRYPATH);
+    Physics physics(DELTA_TIME);
+    physics.addBall(glMain.getScene()->getModelByName("Ball"), BALL_MASS, BALL_RADIUS, BALL_EPSILON);
+    physics.addWalls(COLLISION_GEOMETRY_PATH);
 
     double xAxisRotation = 0.0;
     double yAxisRotation = 0.0;
@@ -76,25 +80,25 @@ int main(int argc, char *argv[]) {
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
-                            if (xAxisRotation > -MAXROTATION) {
+                            if (xAxisRotation > -MAX_ROTATION) {
                                 xAxisRotation -= 1.0;
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_DOWN:
-                            if (xAxisRotation < MAXROTATION) {
+                            if (xAxisRotation < MAX_ROTATION) {
                                 xAxisRotation += 1.0;
                                 xAxisChanged = true;
                             }
                             break;
                         case SDLK_LEFT:
-                            if (yAxisRotation < MAXROTATION) {
+                            if (yAxisRotation < MAX_ROTATION) {
                                 yAxisRotation += 1.0;
                                 yAxisChanged = true;
                             }
                             break;
                         case SDLK_RIGHT:
-                            if (yAxisRotation > -MAXROTATION) {
+                            if (yAxisRotation > -MAX_ROTATION) {
                                 yAxisRotation -= 1.0;
                                 yAxisChanged = true;
                             }
