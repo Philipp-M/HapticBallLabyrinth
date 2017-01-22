@@ -80,6 +80,9 @@ public:
         glm::vec3 angularMomentum; /**< Angular momentum for rigid body simulation. */
         glm::vec3 omega; /**< Angular velocity for rigid body simulation. */
 
+        float rotationAngleSimple;
+        glm::vec3 rotationAxisSimple;
+
         glm::mat3 rotation; /**< Rotation matrix for rigid body simulation. */
         glm::mat3 inverseInertiaTensor; /**< Inverse of inertia tensor for rigid body simulation. */
         glm::vec3 torque; /**< Torque for rigid body simulation. */
@@ -95,7 +98,8 @@ public:
          */
         Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius, float collisionEpsilon) :
                 graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon), velocity(0.0),
-                angularMomentum(0.0), omega(0.0), rotation(1.0), torque(0.0), force(0.0, 0.0, 0.0) {
+                angularMomentum(0.0), omega(0.0), rotation(1.0), torque(0.0), force(0.0, 0.0, 0.0), rotationAngleSimple(0.0),
+                rotationAxisSimple(0.0, 0.0, 0.0) {
             calculateInverseInertiaTensor();
 
             /** Calculate centerpoint of physical model, depending on the centerpoint of the graphical model. */

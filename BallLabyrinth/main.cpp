@@ -10,7 +10,7 @@
 #define PROGRAM_NAME "Ball Labyrinth"
 
 #define OBJFILEPATHLABYRINTH "scenes/Labyrinth.obj"
-#define OBJFILEPATHBALL "scenes/Ball.obj"
+#define OBJFILEPATHBALL "scenes/Ballrough.obj"
 #define MATERIALFOLDER "scenes/"
 #define COLLISIONGEOMETRYPATH "scenes/walloutput.txt"
 

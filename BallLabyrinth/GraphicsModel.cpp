@@ -1,6 +1,7 @@
 #include <tiny_obj_loader.hpp>
 #include <iostream>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include "GraphicsModel.hpp"
 
 
@@ -138,7 +139,8 @@ void GraphicsModel::rotateAroundAxisZ(float angle) {
 }
 
 void GraphicsModel::rotateAroundModelOrigin(glm::mat4 &rotationMat) {
-    rotationMatrixModelOrigin *= rotationMat;
+    rotationMatrixModelOrigin = rotationMat * rotationMatrixModelOrigin;
+    updateModelMatrix();
 }
 
 void GraphicsModel::translate(glm::vec3 &translationVec) {

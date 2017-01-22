@@ -1,6 +1,7 @@
 #include "Physics.hpp"
 
 #include <glm/gtx/string_cast.hpp>
+#include <glm/ext.hpp>
 
 
 Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight,
@@ -8,10 +9,10 @@ Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, floa
     if (y1 == y2) {
         if (x1 > x2) {
             edgepointMin.x = x2;
-            edgepointMax.x = x1+wallwidth;
+            edgepointMax.x = x1 + wallwidth;
         } else {
             edgepointMin.x = x1;
-            edgepointMax.x = x2+wallwidth;
+            edgepointMax.x = x2 + wallwidth;
         }
 
         edgepointMin.y = y1;
@@ -19,10 +20,10 @@ Physics::StaticObject::StaticObject(float x1, float y1, float x2, float y2, floa
     } else if (x1 == x2) {
         if (y1 > y2) {
             edgepointMin.y = y2;
-            edgepointMax.y = y1+wallwidth;
+            edgepointMax.y = y1 + wallwidth;
         } else {
             edgepointMin.y = y1;
-            edgepointMax.y = y2+wallwidth;
+            edgepointMax.y = y2 + wallwidth;
         }
 
         edgepointMin.x = x1;
@@ -60,19 +61,18 @@ void Physics::Ball::resetPosition(Physics::Collision &collision) {
 }
 
 void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
-//    float j = -(collisionEpsilon + 1) * glm::dot(velocity, collision.collisionNormal);
-//    j /= glm::dot(collision.collisionNormal, collision.collisionNormal) * (1.0 / mass);
-//    velocity += j * collision.collisionNormal / mass;
-
     auto rBall = -collision.collisionNormal * radius;
 
     float numerator = -(collisionEpsilon + 1.0f) * glm::dot(velocity, collision.collisionNormal);
     float denominator = (1.0f / mass) * glm::dot(collision.collisionNormal, collision.collisionNormal)
-                     + glm::dot(glm::cross(glm::cross(inverseInertiaTensor * rBall, collision.collisionNormal), rBall), collision.collisionNormal);
+                        +
+                        glm::dot(glm::cross(glm::cross(inverseInertiaTensor * rBall, collision.collisionNormal), rBall),
+                                 collision.collisionNormal);
 
-    float j = numerator/denominator;
+    float j = numerator / denominator;
     velocity += j * collision.collisionNormal / mass;
     omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
+
 //    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
 }
 
@@ -81,6 +81,14 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     force = earthAcceleration * mass;
 
     // Total torque calculation
+//    if(force.x != 0.0 || force.y != 0.0) {
+//        float angle = glm::dot(earthAcceleration, glm::vec3(1.0f, 0.0f, 0.0f)) / (std::sqrt(
+//                earthAcceleration.x * earthAcceleration.x + earthAcceleration.y * earthAcceleration.y +
+//                earthAcceleration.z * earthAcceleration.z));
+//        angle = std::acos(angle);
+//        std::cout << "angle: " << angle << std::endl;
+//        torque = (2.0f / 7.0f * mass * radius * std::sin(angle)) * earthAcceleration;
+//    }
 
     // Update velocity
     velocity += dt * force * 0.7f / mass; // 0.7 factor from the solid sphere inertial tensor
@@ -93,7 +101,6 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     rotation += dt * glm::matrixCross3(omega) * rotation;
     rotation = glm::orthonormalize(rotation);
 
-    std::cout << "rotation: " << glm::to_string(rotation) << std::endl;
     // Update angular momentum
     angularMomentum += dt * torque;
 
@@ -102,7 +109,28 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 
     // Update angular velocity
     omega = inverseInertiaTensor * angularMomentum;
+//    if (velocity.x < -0.0001 || velocity.x > 0.0001 || velocity.y < -0.0001 || velocity.y > 0.0001) {
+//        omega = velocity/radius;
+//    } else {
+//        omega.x = 0.0,
+//        omega.y = 0.0;
+//        omega.z = 0.0;
+//    }
 
+    // Simple calculations to let the ball roll, is just used for update of visual model.
+    if (velocity.x < -0.0001 || velocity.x > 0.0001 || velocity.y < -0.0001 || velocity.y > 0.0001) {
+        // omegaSimple = velocity / radius
+        glm::vec3 omegaSimple = velocity / radius;
+        omegaSimple.z = omegaSimple.y;
+        omegaSimple.y = 0.0;
+        // Normal of vector along y axis and velocity direction -> axis around which the ball is rotating while rolling.
+        rotationAxisSimple = glm::cross(glm::vec3(0.0, 1.0, 0.0), glm::normalize(omegaSimple));
+        // Calculating delta angle, which the ball has to rotate.
+        omegaSimple *= dt;
+        rotationAngleSimple = std::sqrt(omegaSimple.x * omegaSimple.x + omegaSimple.y * omegaSimple.y + omegaSimple.z * omegaSimple.z);
+    } else {
+        rotationAngleSimple = 0.0;
+    }
 
     force.x = 0.0;
     force.y = 0.0;
@@ -127,10 +155,14 @@ void Physics::Ball::updateGraphicsModel() {
 //                                       0.0, 0.0, 1.0, 0.0,
 //                                       0.0, 1.0, 0.0, 0.0,
 //                                       0.0, 0.0, 0.0, 1.0);
-//
 //    // Update rotation matrix around origin of graphicsModel
 //    graphicsModel->resetRotationMatrixModelOrigin();
 //    graphicsModel->rotateAroundModelOrigin(graphicsModelRotation);
+
+    if (velocity.x < -0.0001 || velocity.x > 0.0001 || velocity.y < -0.0001 || velocity.y > 0.0001) {
+        glm::mat4 graphicsModelRotation = glm::rotate(glm::mat4(1.0), rotationAngleSimple, rotationAxisSimple);
+        graphicsModel->rotateAroundModelOrigin(graphicsModelRotation);
+    }
 }
 
 Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0),
