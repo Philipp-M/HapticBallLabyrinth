@@ -77,8 +77,15 @@ void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
 }
 
 void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
+
+    // calculate rolling resistance
+    float forceRoll = 0.01 * std::abs(earthAcceleration.z) * mass;
+
     // Total force calculation
     force = earthAcceleration * mass;
+
+    if((force.x * force.x + force.y * force.y) > (forceRoll*forceRoll) || glm::l2Norm(velocity) > 0.01f)
+        force += -glm::normalize(velocity) * forceRoll; // friction term
 
     // Total torque calculation
 //    if(force.x != 0.0 || force.y != 0.0) {
@@ -93,10 +100,12 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 
     // Update velocity
     velocity += dt * force * 0.7f / mass; // 0.7 factor from the solid sphere inertial tensor
-    velocity += dt * velocity * earthAcceleration.z * 0.002f; // friction term
+    //velocity += dt * velocity * earthAcceleration.z * 0.002f; // friction term
 
     // Update position and linear velocity
     centerpoint += dt * velocity;
+
+    std::cout << "pos: " << glm::to_string(centerpoint) << std::endl;
 
     // Update rotation matrix
     rotation += dt * glm::matrixCross3(omega) * rotation;

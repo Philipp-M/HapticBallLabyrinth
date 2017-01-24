@@ -18,7 +18,7 @@
 #define DELTA_TIME 0.01
 #define BALL_MASS 0.01
 #define BALL_RADIUS 1.0
-#define BALL_EPSILON 0.8
+#define BALL_EPSILON 0.5
 
 int main(int argc, char *argv[]) {
 
