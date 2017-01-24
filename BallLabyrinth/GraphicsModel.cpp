@@ -50,6 +50,19 @@ void GraphicsModel::calculateVertexNormals() {
     }
 }
 
+void GraphicsModel::initializeBuffers() {
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), &vertexData[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.size() * sizeof(GLint), &indexData[0], GL_STATIC_DRAW);
+}
+
+void GraphicsModel::updateModelMatrix() {
+    modelMatrix = rotationMatrixAxis * translationMatrix * rotationMatrixModelOrigin;
+}
+
 GraphicsModel::GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material) :
         name(name), centroid(glm::vec3(0)), vertexData(mesh.positions.size() / 3), material(material),
         translationMatrix(glm::mat4(1.0f)), rotationMatrixAxis(glm::mat4(1.0f)),
@@ -58,6 +71,11 @@ GraphicsModel::GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shar
 
     std::cout << "Added model: " << name << " - number vertices: " << vertexData.size() << " - centroid: " << centroid.x << "/" << centroid.y << "/" << centroid.z << " - material: " << material->name << std::endl;
     initializeBuffers();
+}
+
+GraphicsModel::~GraphicsModel() {
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ibo);
 }
 
 void GraphicsModel::draw(ShaderProgram &shaderProgram) {
@@ -84,15 +102,6 @@ void GraphicsModel::draw(ShaderProgram &shaderProgram) {
     glDrawElements(GL_TRIANGLES, (GLsizei) (size / sizeof(GLuint)), GL_UNSIGNED_INT, 0);
 }
 
-void GraphicsModel::initializeBuffers() {
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), &vertexData[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.size() * sizeof(GLint), &indexData[0], GL_STATIC_DRAW);
-}
-
 const std::string &GraphicsModel::getName() const {
     return name;
 }
@@ -108,11 +117,6 @@ const std::shared_ptr<Material> &GraphicsModel::getMaterial() const {
 const glm::mat4 &GraphicsModel::getModelMatrix() const {
     return modelMatrix;
 }
-
-void GraphicsModel::updateModelMatrix() {
-    modelMatrix = rotationMatrixAxis * translationMatrix * rotationMatrixModelOrigin;
-}
-
 
 void GraphicsModel::rotateAroundAxisX(float angle) {
 //    float cosA = std::cos(glm::radians(angle));
@@ -166,6 +170,8 @@ void GraphicsModel::resetTranslationMatrix() {
     translationMatrix = glm::mat4(1.0);
     updateModelMatrix();
 }
+
+
 
 
 

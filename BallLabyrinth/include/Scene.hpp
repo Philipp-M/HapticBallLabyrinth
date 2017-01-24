@@ -23,20 +23,24 @@ private:
     std::vector<std::shared_ptr<PointLight>> lights; /**< Container to store all lights. */
     Camera camera; /**< Camera of the scene */
 
-public:
-    /**
-     * Construct scene and loads models and materials and sets the camera.
-     * @param objFilePaths Paths to .obj files which contain the necessary models.
-     * @param materialRefFolder Path to the folder containing the .mtl material files.
-     */
-    Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFolder);
-
     /**
      * Loads a new .obj file and adds all the models to the scene.
      * @param objFilePath Path to the .obj file.
      * @param materialRefFolder Path to the folder containing the .mtl material files.
      */
     void loadObjFile(std::string objFilePath, std::string &materialRefFolder);
+
+public:
+    /**
+     * Construct scene and loads models and materials and sets the camera.
+     * @param objFilePaths Paths to .obj files which contain the necessary models.
+     * @param materialRefFolder Path to the folder containing the .mtl material files.
+     * @param width Window width.
+     * @param height Window height.
+     */
+    Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFolder, int width, int height);
+
+    void resetSceneWithNewLabyrinth(std::string &objFilePaths, std::string &materialRefFolder);
 
     /**
      * Draws the whole scene by setting necessary paramerters and calling the draw function from all the models.
@@ -64,6 +68,13 @@ public:
      * @return Pointer to model.
      */
     std::shared_ptr<GraphicsModel> getModelByName(std::string name);
+
+    /**
+     * Set window size.
+     * @param width Window width.
+     * @param height Window height.
+     */
+    void setWindwoSize(int width, int height);
 };
 
 

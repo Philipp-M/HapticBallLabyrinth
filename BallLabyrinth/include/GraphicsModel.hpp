@@ -4,6 +4,7 @@
 #include <memory>
 
 #define GLM_FORCE_RADIANS
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -61,6 +62,11 @@ private:
     void calculateVertexNormals();
 
     /**
+     * Write vbo and ibo to graphics card.
+     */
+    void initializeBuffers();
+
+    /**
      * Updates model matrix.
      * Model matrix = rotationMatrixAxis * translationMatrix * rotationMatrixModelOrigin.
      */
@@ -76,15 +82,17 @@ public:
     GraphicsModel(tinyobj::mesh_t &mesh, std::string &name, std::shared_ptr<Material> material = nullptr);
 
     /**
+     * Destructor for graphics model.
+     * Deletes vbo and ibo.
+     */
+    ~GraphicsModel();
+
+    /**
      * Draw model (All necessary opengl commands).
      * @param shaderProgram Shader program used to draw model.
      */
     void draw(ShaderProgram &shaderProgram);
 
-    /**
-     * Write vbo and ibo to graphics card.
-     */
-    void initializeBuffers();
 
     /**
      * Get model name.

@@ -11,11 +11,17 @@ GLMain::GLMain(SDL_Window *window, SDL_GLContext &context, std::vector<std::stri
 }
 
 GLMain::~GLMain() {
-    cleanup();
+    clearOpenGLSceneAndShaderProgram();
 }
 
-void GLMain::cleanup() {
-    glDeleteBuffers(1, &vbo);
+void GLMain::clearOpenGLSceneAndShaderProgram() {
+    scene.reset();
+    shaderProgram.reset();
+    glDeleteVertexArrays(1, &vao);
+}
+
+void GLMain::initializeNewLabyrinth(std::string &objLabyrinthPath, std::string &materialFolder) {
+    scene->resetSceneWithNewLabyrinth(objLabyrinthPath, materialFolder);
 }
 
 void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
@@ -44,7 +50,11 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     /********** setup the drawing primitive **********/
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    scene.reset(new Scene(objFilePaths, materialFolder));
+    int width, height;
+
+    SDL_GL_GetDrawableSize(window, &width, &height);
+
+    scene.reset(new Scene(objFilePaths, materialFolder, width, height));
 
     /********** setup the initial translation for the ball **********/
     glm::vec3 initTranslation(-13.0, 2.0, -13.0);
@@ -58,18 +68,12 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
 
 void GLMain::reshape(int width, int height) {
     glViewport(0, 0, width, height);
+    scene->setWindwoSize(width, height);
 }
 
 void GLMain::display() {
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     scene->draw(*shaderProgram);
-
-    /*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    shaderProgram->bind();
-    glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);*/
 }
 
 void GLMain::rotateModelAroundAxis(int id, int axis, float angle) {

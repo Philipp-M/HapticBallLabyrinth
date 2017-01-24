@@ -72,14 +72,12 @@ void Physics::Ball::updateCollisionImpulse(Physics::Collision &collision) {
     float j = numerator / denominator;
     velocity += j * collision.collisionNormal / mass;
     omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
-
-//    velocity = glm::reflect(velocity, collision.collisionNormal*0.8f);
 }
 
 void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
 
     // calculate rolling resistance
-    float forceRoll = 0.01 * std::abs(earthAcceleration.z) * mass;
+    float forceRoll = rollingFrictionCoefficient * std::abs(earthAcceleration.z) * mass;
 
     // Total force calculation
     force = earthAcceleration * mass;
@@ -105,7 +103,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
     // Update position and linear velocity
     centerpoint += dt * velocity;
 
-    std::cout << "pos: " << glm::to_string(centerpoint) << std::endl;
+//    std::cout << "pos: " << glm::to_string(centerpoint) << std::endl;
 
     // Update rotation matrix
     rotation += dt * glm::matrixCross3(omega) * rotation;
@@ -180,8 +178,8 @@ Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -E
                              yaw(0.0) {
 }
 
-void Physics::addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon) {
-    ballObjects.push_back(Ball(model, mass, radius, collisionEpsilon));
+void Physics::addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon, float rollingFriction) {
+    ballObjects.push_back(Ball(model, mass, radius, collisionEpsilon, rollingFriction));
 }
 
 void Physics::addWalls(std::string file) {
@@ -255,9 +253,22 @@ void Physics::quitPhysics() {
     lock.unlock();
 }
 
+bool Physics::inGame() const {
+    lock.lock();
+    glm::vec3 tmp = ballObjects[0].centerpoint;
+    lock.unlock();
+    if(tmp.x > 15.0 || tmp.x < -15.0 || tmp.y > 15.0 || tmp.y < -15.0) {
+        if(tmp.z < 0.0) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Physics::updateGraphicsModel() {
     lock.lock();
     ballObjects[0].updateGraphicsModel();
     lock.unlock();
 }
+
 

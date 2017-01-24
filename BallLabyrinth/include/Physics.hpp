@@ -23,7 +23,7 @@
 
 #include "GraphicsModel.hpp"
 
-#define EARTH_ACCEL 981.0
+#define EARTH_ACCEL 981.0 /**< Earth acceleration constant in cm/s^2 */
 
 /**
  * Lock used to synchronize memory, where the physics and the graphics thread access.
@@ -72,8 +72,9 @@ public:
         std::shared_ptr<GraphicsModel> graphicsModel; /**< Pointer to graphicsModel object, which represents this ball visually. */
 
         float mass; /**< Mass of ball in kilo gramm. */
-        float radius; /**< Radius of ball in millimeters. */
+        float radius; /**< Radius of ball in centimeters. */
         float collisionEpsilon; /**< Constant to describe collision type, it should be between 0.0 and 1.0. */
+        float rollingFrictionCoefficient; /**< Constant used to calculate rolling friction */
         glm::vec3 centerpoint; /**< Centerpoint of ball. */
 
         glm::vec3 velocity; /**< Velocity for rigid body simulation. */
@@ -95,11 +96,12 @@ public:
          * @param mass Mass of ball.
          * @param radius Radius of ball.
          * @param collisionEpsilon Constant describing the type of physical collision, should be between 0.0 and 1.0.
+         * @param rollingFriction Constant used to calculate the rolling friction.
          */
-        Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius, float collisionEpsilon) :
-                graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon), velocity(0.0),
-                angularMomentum(0.0), omega(0.0), rotation(1.0), torque(0.0), force(0.0, 0.0, 0.0), rotationAngleSimple(0.0),
-                rotationAxisSimple(0.0, 0.0, 0.0) {
+        Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius, float collisionEpsilon, float rollingFriction) :
+                graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon),
+                rollingFrictionCoefficient(rollingFriction), velocity(0.0),angularMomentum(0.0), omega(0.0), rotation(1.0),
+                torque(0.0), force(0.0, 0.0, 0.0), rotationAngleSimple(0.0), rotationAxisSimple(0.0, 0.0, 0.0) {
             calculateInverseInertiaTensor();
 
             /** Calculate centerpoint of physical model, depending on the centerpoint of the graphical model. */
@@ -170,8 +172,9 @@ public:
      * @param mass Mass of ball in kg.
      * @param radius Radius of ball in mm.
      * @param collisionEpsilon Constant describing the type of physical collision, should be between 0.0 and 1.0.
+     * @param rollingFriction Constant used to calculate the rolling friction.
      */
-    void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon);
+    void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon, float rollingFriction);
 
     /**
      * Loads file for collision geometries and adds AABB boxes for all walls and the floor of the labyrinth.
@@ -201,6 +204,11 @@ public:
      * Sets rotation and translation matrices of the graphics model according to the updated physics.
      */
     void updateGraphicsModel();
+
+    /**
+     * Returns centerpoint of ball.
+     */
+     bool inGame() const;
 
     /**
      * Let the physics thread leave the loop of the update function, ends physics calculation.

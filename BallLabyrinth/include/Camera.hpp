@@ -31,6 +31,14 @@ public:
 
     const glm::vec3 &getPosition() const;
 
+
+    /**
+     * Set window size.
+     * @param width Window width.
+     * @param height Window height.
+     */
+    void setWindowSize(int width, int height);
+
 private:
     float height;
     float width;

@@ -13,17 +13,17 @@
 #   -c, --columns
 #      Number of maze columns running the maze width (default = 8)
 #   -f, --floor
-#      Physical thickness in millimeters of the maze floor (default = 2.000000)
+#      Physical thickness in centimeters of the maze floor (default = 2.000000)
 #   -h, --height
-#      Physical height in millimeters of the maze (default = 8.000000)
+#      Physical height in centimeters of the maze (default = 8.000000)
 #   -l, --length
-#      Physical length in millimeters of the maze (default = 30.000000)
+#      Physical length in centimeters of the maze (default = 30.000000)
 #   -r, --rows
 #      Number of maze rows running the maze height (default = 8)
 #   -t, --thickness
-#      Physical maze wall thickness in millimeters (default = 1.000000)
+#      Physical maze wall thickness in centimeters (default = 1.000000)
 #   -w, --width`
-#      Physical width in millimeters of the maze (default = 30.000000)
+#      Physical width in centimeters of the maze (default = 30.000000)
 #   output-file
 #      Name of the output file to generate; if not specified then
 #      output will be written to standard output
@@ -68,22 +68,22 @@ def usage( prog, exit_stat=0 ):
 '     Number of maze columns running the maze width (default = %d)\n' % DEFAULT_COLS
 	str += \
 '  -f, --floor\n' + \
-'     Physical thickness in millimeters of the maze floor (default = %f)\n' % DEFAULT_FLOOR_THICKNESS
+'     Physical thickness in centimeters of the maze floor (default = %f)\n' % DEFAULT_FLOOR_THICKNESS
 	str += \
 '  -h, --height\n' + \
-'     Physical height in millimeters of the maze (default = %f)\n' % DEFAULT_HEIGHT
+'     Physical height in centimeters of the maze (default = %f)\n' % DEFAULT_HEIGHT
 	str += \
 '  -l, --length\n' + \
-'     Physical length in millimeters of the maze (default = %f)\n' % DEFAULT_LENGTH
+'     Physical length in centimeters of the maze (default = %f)\n' % DEFAULT_LENGTH
 	str += \
 '  -r, --rows\n' + \
 '     Number of maze rows running the maze length (default = %d)\n' % DEFAULT_ROWS
 	str += \
 '  -t, --thickness\n' + \
-'     Physical maze wall thickness in millimeters (default = %f)\n' % wt
+'     Physical maze wall thickness in centimeters (default = %f)\n' % wt
 	str += \
 '  -w, --width\n' + \
-'     Physical width in millimeters of the maze (default = %f)\n' % DEFAULT_WIDTH
+'     Physical width in centimeters of the maze (default = %f)\n' % DEFAULT_WIDTH
 	str += \
 '  output-file\n' + \
 '     Name of the output file to generated; if not specified then\n' + \

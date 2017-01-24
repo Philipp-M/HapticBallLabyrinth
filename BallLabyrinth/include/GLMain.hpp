@@ -11,7 +11,6 @@ private:
     std::shared_ptr<Scene> scene;
     std::shared_ptr<ShaderProgram> shaderProgram;
     GLuint vao;
-    GLuint vbo;
 
     std::vector<std::string> objFilePaths;
     std::string materialFolder;
@@ -23,7 +22,9 @@ public:
 
     ~GLMain();
 
-    void cleanup();
+    void clearOpenGLSceneAndShaderProgram();
+
+    void initializeNewLabyrinth(std::string &objLabyrinthPath, std::string &materialFolder);
 
     void display();
 

@@ -6,19 +6,6 @@
 #include <iostream>
 #include "Scene.hpp"
 
-Scene::Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFolder) :
-        camera(600, 800, 60.0, 0.01, 1000.0, glm::vec3(0.0, 40.0, 0.0), glm::vec3(0.0, 0.0, -1.0), 0.0, -90.0) {
-    for(auto &filePath: objFilePaths) {
-        loadObjFile(filePath, materialRefFolder);
-    }
-
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(0.0, 60.0, 0.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 1500, 1.0, 0.2)));
-}
-
 void Scene::loadObjFile(std::string filename, std::string &materialRefFolder) {
     std::vector<tinyobj::shape_t> objectShape;
     std::vector<tinyobj::material_t> objectMaterial;
@@ -38,17 +25,63 @@ void Scene::loadObjFile(std::string filename, std::string &materialRefFolder) {
     for (auto &object: objectShape) {
         if (object.mesh.material_ids.size() > 0) {
             models.push_back(std::shared_ptr<GraphicsModel>(new GraphicsModel(object.mesh, object.name,
-                                                              MaterialManager::getInstance().getByName(
-                                                                      objectMaterial[object.mesh.material_ids[0]].name))));
+                                                                              MaterialManager::getInstance().getByName(
+                                                                                      objectMaterial[object.mesh.material_ids[0]].name))));
         } else {
             models.push_back(std::shared_ptr<GraphicsModel>(new GraphicsModel(object.mesh, object.name)));
         }
-//        if (object.name == "light") {
-//            std::shared_ptr<GraphicsModel> m = models[models.size() - 1];
-//            lights.push_back(std::shared_ptr<PointLight>(
-//                    new PointLight(m->getCentroid(), m->getMaterial()->diffuseColor, 0.5, 0.001)));
-//        }
     }
+}
+
+Scene::Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFolder, int width, int height) :
+        camera(height, width, 60.0, 0.01, 1000.0, glm::vec3(0.0, 40.0, 0.0), glm::vec3(0.0, 0.0, -1.0), 0.0, -90.0) {
+    for(auto &filePath: objFilePaths) {
+        loadObjFile(filePath, materialRefFolder);
+    }
+
+    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
+    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
+    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
+    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
+    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(0.0, 60.0, 0.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 1500, 1.0, 0.2)));
+}
+
+void Scene::resetSceneWithNewLabyrinth(std::string &objFilePaths, std::string &materialRefFolder) {
+    std::vector<std::shared_ptr<GraphicsModel>> tmp;
+
+    bool modelFound = false;
+
+    for(auto &model: models) {
+        if(model->getName() != "Labyrinth") {
+            model->resetRotationMatrixModelOrigin();
+            model->resetRotationMatrixAxis();
+            model->resetTranslationMatrix();
+            tmp.push_back(model);
+        } else {
+            if(!model.unique()) {
+                std::cout << "Model found, but is not unique -> could not be deleted." << std::endl;
+                exit(-1);
+            }
+            modelFound = true;
+            break;
+        }
+    }
+
+    if(!modelFound) {
+        std::cout << "Could not find model -> shutdown." << std::endl;
+        exit(-1);
+    }
+
+//    models.clear();
+//    models.resize(0);
+
+    models = tmp;
+    loadObjFile(objFilePaths, materialRefFolder);
+
+    glm::vec3 initTranslation(-13.0, 2.0, -13.0);
+    getModelByName("Ball")->translate(initTranslation);
+    glm::vec4 mirrorAxis(1.0, 1.0, -1.0, 1.0);
+    getModelByName("Labyrinth")->mirror(mirrorAxis);
 }
 
 void Scene::draw(ShaderProgram &shaderProgram) {
@@ -94,6 +127,10 @@ std::shared_ptr<GraphicsModel> Scene::getModelByName(std::string name) {
         }
     }
     return nullptr;
+}
+
+void Scene::setWindwoSize(int width, int height) {
+    camera.setWindowSize(width, height);
 }
 
 

@@ -35,6 +35,11 @@ const glm::vec3 &Camera::getPosition() const {
     return position;
 }
 
+void Camera::setWindowSize(int width, int height) {
+    this->width = width;
+    this->height = height;
+}
+
 void Camera::updateCameraParameters() {
         glm::vec3 direction;
 
@@ -45,3 +50,5 @@ void Camera::updateCameraParameters() {
         front = glm::normalize(direction);
         right = glm::normalize(glm::cross(front, up));
     }
+
+
