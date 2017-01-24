@@ -23,6 +23,59 @@
 #define BALL_EPSILON 0.5 /**< Ball refraction material constant. */
 #define BALL_ROLL_FRICTION 0.01 /**< Ball roll friction constant. */
 
+
+int showMessageBox(float elapsedTime) {
+    const SDL_MessageBoxButtonData buttons[] = {
+            {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 0, "start"},
+            {SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 1, "quit"},
+    };
+    const SDL_MessageBoxColorScheme colorScheme = {
+            { /* .colors (.r, .g, .b) */
+                    /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+                    {255, 0, 0},
+                    /* [SDL_MESSAGEBOX_COLOR_TEXT] */
+                    {0, 255, 0},
+                    /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+                    {255, 255, 0},
+                    /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+                    {0, 0, 255},
+                    /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+                    {255, 0, 255}
+            }
+    };
+
+    std::string message;
+
+    if(elapsedTime > 0.0) {
+        message = "It took you " + std::to_string(elapsedTime) + " seconds to complete.";
+    } else {
+        message = "Press start to begin!";
+    }
+
+    const SDL_MessageBoxData messageboxdata = {
+            SDL_MESSAGEBOX_INFORMATION, /* .flags */
+            NULL, /* .window */
+            "Ball Labyrinth", /* .title */
+            message.c_str(), /* .message */
+            SDL_arraysize(buttons), /* .numbuttons */
+            buttons,
+            NULL /* .buttons */
+    };
+    int buttonid;
+    if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+        std::cout << "error displaying message box!" << std::endl;
+        return -1;
+    }
+
+    if (buttonid == -1) {
+        std::cout << "no button selected!" << std::endl;
+        return -1;
+    } else {
+        return buttonid;
+    }
+}
+
+
 int main(int argc, char *argv[]) {
 
     SDL_Window *mainwindow; /**< Window handle. */
@@ -71,12 +124,15 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> objFilePaths = {OBJ_FILE_PATH_BALL, labyrinthObjFilePath}; /**< Path for obj files. */
     GLMain glMain(mainwindow, maincontext, objFilePaths, materialFolder);
 
+    showMessageBox(0.0);
+
     while (!quit) {
         SDL_Event event;
 
         /** Create physics object and add collision models. */
         Physics physics(DELTA_TIME);
-        physics.addBall(glMain.getScene()->getModelByName("Ball"), BALL_MASS, BALL_RADIUS, BALL_EPSILON, BALL_ROLL_FRICTION);
+        physics.addBall(glMain.getScene()->getModelByName("Ball"), BALL_MASS, BALL_RADIUS, BALL_EPSILON,
+                        BALL_ROLL_FRICTION);
 
         physics.addWalls(collisionGeometryFilePath);
 
@@ -88,10 +144,12 @@ int main(int argc, char *argv[]) {
 
 
         unsigned int gameStartTime = SDL_GetTicks();
+        float endTime;
 //    unsigned int startTime = SDL_GetTicks();
 //    unsigned int frames = 0;
 
-        std::thread physicsThread(&Physics::update, std::ref(physics)); /**< Physics thread, calling the update function of the physics object. */
+        std::thread physicsThread(&Physics::update, std::ref(
+                physics)); /**< Physics thread, calling the update function of the physics object. */
 
         /** Game loop */
         while (!quit && physics.inGame()) {
@@ -188,13 +246,23 @@ int main(int argc, char *argv[]) {
 //        }
         }
 
+        endTime = ((float)(SDL_GetTicks() - gameStartTime)) / 1000.0f;
+
         physics.quitPhysics();
 
         physicsThread.join();
 
-        labyrinthObjFilePath = OBJ_FILE_PATH_LABYRINTH + std::to_string(labyrinthIndex%10 + 1) + ".obj";
-        collisionGeometryFilePath = COLLISION_GEOMETRY_PATH + std::to_string(labyrinthIndex%10 + 1) + ".txt";
+        if(!quit) {
+            if(showMessageBox(endTime) != 0) {
+                break;
+            }
+
+        }
+
+        labyrinthObjFilePath = OBJ_FILE_PATH_LABYRINTH + std::to_string(labyrinthIndex % 10 + 1) + ".obj";
+        collisionGeometryFilePath = COLLISION_GEOMETRY_PATH + std::to_string(labyrinthIndex % 10 + 1) + ".txt";
         labyrinthIndex++;
+
 
         glMain.initializeNewLabyrinth(labyrinthObjFilePath, materialFolder);
     }
