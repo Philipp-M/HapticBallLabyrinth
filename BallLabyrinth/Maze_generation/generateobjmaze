@@ -9,14 +9,15 @@
 #cp Labyrinthtemp1.obj ../scenes/Labyrinth.obj
 #mv walloutput.txt ../scenes/
 
-for i in `seq 1 10`;
+for i in `seq 1 20`;
         do
-                rm aLabyrinth*
                 python maze.py > aLabyrinth.scad
                 openscad -o aLabyrinth.stl aLabyrinth.scad
                 blender --background --python convert_stl_to_blend.py -- aLabyrinth.stl aLabyrinth.obj
                 cat aLabyrinth.obj | sed -e "s/usemtl None/usemtl Woodlabyrinth/" > aLabyrinthtemp.obj
-                cat aLabyrinthtemp.obj | sed -e "s/mtllib Labyrinth.mtl/mtllib LabyrinthandBallblend.mtl/" > aLabyrinthtemp1.obj
-                cp aLabyrinthtemp1.obj Labyrinth${i}.obj
-                cp walloutput.txt walloutput${i}.txt
+                cat aLabyrinthtemp.obj | sed -e "s/mtllib aLabyrinth.mtl/mtllib LabyrinthandBallblend.mtl/" > aLabyrinthtemp1.obj
+                cp aLabyrinthtemp1.obj ../scenes/labyrinths/Labyrinth${i}.obj
+                cp walloutput.txt ../scenes/labyrinths/walloutput${i}.txt
+                rm aLabyrinth*
+                rm walloutput.txt
         done   
