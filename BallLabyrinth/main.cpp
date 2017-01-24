@@ -15,7 +15,7 @@
 #define COLLISION_GEOMETRY_PATH "scenes/labyrinths/walloutput"
 
 #define MAX_ROTATION 5 /**< Maximum tilt degree for labyrinth. */
-#define ROTATION_STEP 0.1 /**< Rotation step in degree to tilt labyrinth */
+#define ROTATION_STEP 0.15 /**< Rotation step in degree to tilt labyrinth */
 
 #define DELTA_TIME 0.01 /**< Loop time for physics thread. */
 #define BALL_RADIUS 1.0 /**< Ball radius in centimeters. */
