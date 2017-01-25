@@ -1,0 +1,109 @@
+%----------------------------------------------------------------------------------------
+% Einführung in das Wissenschaftliche Arbeiten 
+% Report LaTeX template (English)
+% Interactive Graphics and Simulation Group
+% University of Innsbruck
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt,a4paper]{article}
+
+%----------------------------------------------------------------------------------------
+% Include required packages
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{pdfpages}
+\usepackage{url}
+\usepackage{subfig}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{float}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+%\usepackage[ngerman]{babel}
+
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset {
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\scriptsize,% basic font setting
+    captionpos=b,
+    numbers = left,
+    breaklines=true,
+}
+
+%\usepackage[utf8x]{inputenc}
+%\usepackage[T1]{fontenc}
+
+\usepackage[left=2.7cm, right=2.7cm, top=3cm]{geometry}
+
+% Set up the header and footer
+\pagestyle{fancy}
+\rhead{}
+\lhead{}
+\chead{}
+\lfoot{Sch{\"o}pf, Spiss} % Bottom left footer
+\cfoot{Physical based simulation - Project Proposal} % Bottom center footer
+\rfoot{Page\ \thepage\ of\ \protect\pageref{LastPage}} % Bottom right footer
+\renewcommand\footrulewidth{0.4pt} % Size of the footer rule
+\renewcommand{\headrulewidth}{0pt}
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+%----------------------------------------------------------------------------------------
+% Start document
+
+\begin{document}
+\begin{center}
+{\LARGE \bf Project Proposal}
+
+Physical based simulation PS\\[5mm]
+
+Lukas Sch\"opf\\Stefan Spiss\\[5mm]
+
+Innsbruck, \today
+\end{center}
+
+
+%----------------------------------------------------------------------------------------
+% Main body
+%----------------------------------------------------------------------------------------
+
+\section{Overall idea}
+\label{sec:overall}
+Implementation of a game similar to the game shown in the video at the following link:\\
+\href{https://www.youtube.com/watch?v=JutEsb0ye94}{https://www.youtube.com/watch?v=JutEsb0ye94}\\\\
+Additionally, also an example App for that game can be found at: \\
+\href{http://www.mobogenie.com/download-labyrinth-ball-in-balance-2d-1746679.html}{http://www.mobogenie.com/download-labyrinth-ball-in-balance-2d-1746679.html}\\
+
+In the game a labyrinth is shown from above and the goal is to navigate a ball from start to goal. The ball is controlled by tilting the board. 
+
+\section{Technical implementation}
+\label{sec:technical}
+\begin{itemize}
+\item 3D model of labyrinth
+\item Rendering in OpenGL combined with SDL 2.0
+\item Tilting controlled by mouse or keyboard
+\item Physical-based implementation:
+\begin{itemize}
+\item Ball and maze are rigid bodies
+\item Ball can collide with maze
+\item Ball starts to roll according to gravity, when the board is tilted
+\item Additionally, adding roll friction to the ball
+\end{itemize}
+\end{itemize}
+
+\section{Development roadmap}
+\label{sec:roadmap}
+\begin{enumerate}
+\item Setting up the whole graphical visualisation and the controlling interface.
+\item Implementing the rigid body simulation.
+\item Implementing collisions of the rigid bodies.
+\item Implementing gravity-induced rolling of the ball.
+\item Adding game elements (start, win, fail)
+\end{enumerate}
+%----------------------------------------------------------------------------------------
+% Bibliography
+%----------------------------------------------------------------------------------------
+
+
+
+\end{document}
