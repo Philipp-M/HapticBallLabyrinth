@@ -21,7 +21,7 @@
 #define BALL_RADIUS 1.0 /**< Ball radius in centimeters. */
 #define BALL_MASS 7.82 * 4.0 / 3.0 * M_PI * BALL_RADIUS * BALL_RADIUS * BALL_RADIUS /**< Ball mass for density of steel in gramm. */
 #define BALL_EPSILON 0.5 /**< Ball refraction material constant. */
-#define BALL_ROLL_FRICTION 0.01 /**< Ball roll friction constant. */
+#define BALL_ROLL_FRICTION 0.001 /**< Ball roll friction constant. */
 
 
 int showMessageBox(float elapsedTime) {
