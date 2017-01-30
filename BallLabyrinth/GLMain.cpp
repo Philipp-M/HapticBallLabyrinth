@@ -42,8 +42,8 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
 
     /********** setup shader **********/
     shaderProgram.reset(new ShaderProgram("BallLabyrinth"));
-    shaderProgram->attachShader(Shader("vertex", "shaders/defaultVs.glsl", ShaderType::VERTEX));
-    shaderProgram->attachShader(Shader("fragment", "shaders/defaultFs.glsl", ShaderType::FRAGMENT));
+    shaderProgram->attachShader(Shader("vertex", "shaders/vertexShader.glsl", ShaderType::VERTEX));
+    shaderProgram->attachShader(Shader("fragment", "shaders/fragmentShader.glsl", ShaderType::FRAGMENT));
     shaderProgram->link();
     shaderProgram->bind();
 
