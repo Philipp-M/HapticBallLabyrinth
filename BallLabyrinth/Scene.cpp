@@ -85,7 +85,6 @@ void Scene::resetSceneWithNewLabyrinth(std::string &objFilePaths, std::string &m
 }
 
 void Scene::draw(ShaderProgram &shaderProgram) {
-    //shaderProgram.bind();
     shaderProgram.setUniform3f("cameraPosition", camera.getPosition());
     shaderProgram.setUniform1i("numPointLights", lights.size());
 
@@ -97,8 +96,6 @@ void Scene::draw(ShaderProgram &shaderProgram) {
         shaderProgram.setMatrixUniform4f("MVPMatrix", camera.getProjectionMatrix() * camera.getViewMatrix() * model->getModelMatrix());
         model->draw(shaderProgram);
     }
-
-    //shaderProgram.unbind();
 }
 
 void Scene::rotateModelAroundAxis(int id, int axis, float angle) {

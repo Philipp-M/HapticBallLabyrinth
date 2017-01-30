@@ -13,7 +13,9 @@ void GraphicsModel::computeVertices(tinyobj::mesh_t &mesh) {
                                glm::vec3());
 
         if (mesh.texcoords.size() >= i * 2 + 1) {
-            // u and v coordinates, 1.0 - mesh.textcoords[i * 2 + 1] as openGL y texture coordinates opposite than the the coordinates used with meshes.
+            /** u and v coordinates,
+             *  1.0 - mesh.textcoords[i * 2 + 1]: OpenGL y texture coordinates opposite to the coordinates used with meshes.
+             */
             vertexData[i].textureCoordinate = glm::vec2(mesh.texcoords[i * 2], 1.0 - mesh.texcoords[i * 2 + 1]);
         }
 
