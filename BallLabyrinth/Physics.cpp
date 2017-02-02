@@ -136,6 +136,7 @@ void Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration) {
         // Calculating delta angle, which the ball has to rotate.
         omegaSimple *= dt;
         rotationAngleSimple = std::sqrt(omegaSimple.x * omegaSimple.x + omegaSimple.y * omegaSimple.y + omegaSimple.z * omegaSimple.z);
+        rotationMatGraphicsModel = glm::rotate(glm::mat4(1.0), rotationAngleSimple, rotationAxisSimple) * rotationMatGraphicsModel;
     } else {
         rotationAngleSimple = 0.0;
     }
@@ -170,7 +171,8 @@ void Physics::Ball::updateGraphicsModel() {
     // Update rotation of graphics model according to simple calculation of rotation depending on velocity
     if (velocity.x < -0.0001 || velocity.x > 0.0001 || velocity.y < -0.0001 || velocity.y > 0.0001) {
         glm::mat4 graphicsModelRotation = glm::rotate(glm::mat4(1.0), rotationAngleSimple, rotationAxisSimple);
-        graphicsModel->rotateAroundModelOrigin(graphicsModelRotation);
+        graphicsModel->resetRotationMatrixModelOrigin();
+        graphicsModel->rotateAroundModelOrigin(rotationMatGraphicsModel);
     }
 }
 

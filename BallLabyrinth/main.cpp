@@ -17,7 +17,7 @@
 #define MAX_ROTATION 5 /**< Maximum tilt degree for labyrinth. */
 #define ROTATION_STEP 0.15 /**< Rotation step in degree to tilt labyrinth */
 
-#define DELTA_TIME 0.01 /**< Loop time for physics thread. */
+#define DELTA_TIME 0.001 /**< Loop time for physics thread. */
 #define BALL_RADIUS 1.0 /**< Ball radius in centimeters. */
 #define BALL_MASS 7.82 * 4.0 / 3.0 * M_PI * BALL_RADIUS * BALL_RADIUS * BALL_RADIUS /**< Ball mass for density of steel in gramm. */
 #define BALL_EPSILON 0.5 /**< Ball refraction material constant. */
