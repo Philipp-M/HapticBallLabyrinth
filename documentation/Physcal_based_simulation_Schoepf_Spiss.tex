@@ -204,7 +204,9 @@ The whole process of generating a maze is rather compute intense due to the cad 
 
 \section{System Overview}
 \label{sec:systemOverview}
-The program is divided into two parts, one does the physics calculation in a seperate thread with a higer update rate and the other displays the current graphics state via OpenGL. The 
+The program is divided into two parts, one does the physics calculation in a seperate thread with a higer update rate and the other displays the current graphics state via OpenGL. \\
+The program can be compiled with Cmake. When started a prompt opens and with pressing enter the game starts.
+The aim of this game is to navigate the ball out of the maze. This can be achieved with tilting the board with the arrow keys. Once the ball falls off the maze a new level is loaded and the time it took to complete it displayed. After the 10th maze is completed the game starts over with the first maze.
 
 \section{Conclusion}
 \label{sec:conclusion}
