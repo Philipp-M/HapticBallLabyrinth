@@ -1,5 +1,5 @@
-#include <glm/ext.hpp>
 #include <GL/glew.h>
+#include <glm/ext.hpp>
 #include <iostream>
 #include <map>
 #include <stdlib.h>
@@ -66,7 +66,7 @@ void ShaderProgram::unbind() const {
     glUseProgram(0);
 }
 
-bool ShaderProgram::vertexAttribPointer(const std::string &attribName, GLint size, GLenum type, GLsizei stride,
+void ShaderProgram::vertexAttribPointer(const std::string &attribName, GLint size, GLenum type, GLsizei stride,
                                         const GLvoid *data,
                                         bool normalize) const {
     glVertexAttribPointer(attributeLocation(attribName), size, type, normalize, stride, data);

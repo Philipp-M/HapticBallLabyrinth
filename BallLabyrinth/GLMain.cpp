@@ -1,5 +1,4 @@
 #include <GL/glew.h>
-#include <GL/gl.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <iostream>
@@ -40,6 +39,10 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     /********** VSYNC **********/
     SDL_GL_SetSwapInterval(1);
 
+    /********** setup and bind vertex array since necessary for MAC to run before creating shader programs *********/
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
     /********** setup shader **********/
     shaderProgram.reset(new ShaderProgram("BallLabyrinth"));
     shaderProgram->attachShader(Shader("vertex", "shaders/vertexShader.glsl", ShaderType::VERTEX));
@@ -48,8 +51,7 @@ void GLMain::initializeGraphics(SDL_Window *window, SDL_GLContext &context) {
     shaderProgram->bind();
 
     /********** setup the drawing primitive **********/
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+
     int width, height;
 
     SDL_GL_GetDrawableSize(window, &width, &height);

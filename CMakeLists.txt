@@ -1,11 +1,14 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
+project(HapticBallLabyrinth)
+
+set(CMAKE_CXX_STANDARD 11)
+
+include_directories(BallLabyrinth/include)
+
 project(BallLabyrinth)
 
-if (APPLE)
-    set(CMAKE_CXX_COMPILER "g++-8")
-endif()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 # find SDL2 and SDL2_image
 find_package(SDL2 REQUIRED)
@@ -60,3 +63,4 @@ target_link_libraries(BallLabyrinth
         ${GLEW_LIBRARIES}
         ${SDL2_LIBRARY}
         ${SDL2_IMAGE_LIBRARY})
+

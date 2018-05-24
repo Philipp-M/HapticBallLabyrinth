@@ -2,7 +2,15 @@
 
 #include <string>
 #include <vector>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <GL/gl.h>
+
+#endif
 #include <glm/glm.hpp>
 #include "Shader.hpp"
 
@@ -25,7 +33,7 @@ public:
 
 	void link();
 
-	bool vertexAttribPointer(const std::string &attribName, GLint size, GLenum type, GLsizei stride, const GLvoid *data,
+	void vertexAttribPointer(const std::string &attribName, GLint size, GLenum type, GLsizei stride, const GLvoid *data,
 	                         bool normalize) const;
 
 	GLuint attributeLocation(const std::string &name) const;
