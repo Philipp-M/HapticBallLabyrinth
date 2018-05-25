@@ -181,7 +181,7 @@ Physics::Physics(float dt) : dt(dt), quit(false), earthAcceleration(0.0, 0.0, -E
 }
 
 void Physics::addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon, float rollingFriction) {
-    ballObjects.push_back(Ball(model, mass, radius, collisionEpsilon, rollingFriction));
+    ballObjects.emplace_back(Ball(model, mass, radius, collisionEpsilon, rollingFriction));
 }
 
 void Physics::addWalls(std::string file) {
@@ -206,7 +206,7 @@ void Physics::addWalls(std::string file) {
         }
         myfile.close();
 
-        walls.push_back(StaticObject(startx, starty, startx + widthx, starty, 0.0, floorheight, widthy));
+        walls.emplace_back(StaticObject(startx, starty, startx + widthx, starty, 0.0, floorheight, widthy));
         std::cout << "walls loaded: " << walls.size() << std::endl;
     }
 }

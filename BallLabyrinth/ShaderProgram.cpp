@@ -2,7 +2,7 @@
 #include <glm/ext.hpp>
 #include <iostream>
 #include <map>
-#include <stdlib.h>
+#include <cstdlib>
 #include "ShaderProgram.hpp"
 
 
@@ -31,7 +31,7 @@ void ShaderProgram::link() {
     glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
 
     if (success == 0) {
-        glGetProgramInfoLog(shaderProgramId, sizeof(errorLog), NULL, errorLog);
+        glGetProgramInfoLog(shaderProgramId, sizeof(errorLog), nullptr, errorLog);
         std::cerr << "Error linking shader program: " << errorLog << std::endl;
         exit(1);
     }
@@ -41,7 +41,7 @@ void ShaderProgram::link() {
     glGetProgramiv(shaderProgramId, GL_VALIDATE_STATUS, &success);
 
     if (!success) {
-        glGetProgramInfoLog(shaderProgramId, sizeof(errorLog), NULL, errorLog);
+        glGetProgramInfoLog(shaderProgramId, sizeof(errorLog), nullptr, errorLog);
         std::cerr << "Invalid shader program: " << errorLog << std::endl;
         exit(1);
     }

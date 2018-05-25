@@ -83,7 +83,7 @@ GraphicsModel::~GraphicsModel() {
 void GraphicsModel::draw(ShaderProgram &shaderProgram) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(shaderProgram.attributeLocation("position"));
-    shaderProgram.vertexAttribPointer("position", 3, GL_FLOAT, sizeof(Vertex), 0, false);
+    shaderProgram.vertexAttribPointer("position", 3, GL_FLOAT, sizeof(Vertex), nullptr, false);
     glEnableVertexAttribArray(shaderProgram.attributeLocation("normal"));
     shaderProgram.vertexAttribPointer("normal", 3, GL_FLOAT, sizeof(Vertex), (void *) (sizeof(glm::vec3)), false);
 //  glEnableVertexAttribArray(shaderProgram.attributeLocation("texCoord"));
@@ -101,7 +101,7 @@ void GraphicsModel::draw(ShaderProgram &shaderProgram) {
 
     GLint size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    glDrawElements(GL_TRIANGLES, (GLsizei) (size / sizeof(GLuint)), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, (GLsizei) (size / sizeof(GLuint)), GL_UNSIGNED_INT, nullptr);
 }
 
 const std::string &GraphicsModel::getName() const {

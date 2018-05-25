@@ -19,7 +19,7 @@
 
 #define DELTA_TIME 0.001 /**< Loop time for physics thread. */
 #define BALL_RADIUS 1.0 /**< Ball radius in centimeters. */
-#define BALL_MASS 7.82 * 4.0 / 3.0 * M_PI * BALL_RADIUS * BALL_RADIUS * BALL_RADIUS /**< Ball mass for density of steel in gramm. */
+#define BALL_MASS (7.82 * 4.0 / 3.0 * M_PI * BALL_RADIUS * BALL_RADIUS * BALL_RADIUS) /**< Ball mass for density of steel in gramm. */
 #define BALL_EPSILON 0.5 /**< Ball refraction material constant. */
 #define BALL_ROLL_FRICTION 0.001 /**< Ball roll friction constant. */
 
@@ -54,12 +54,12 @@ int showMessageBox(float elapsedTime) {
 
     const SDL_MessageBoxData messageboxdata = {
             SDL_MESSAGEBOX_INFORMATION, /* .flags */
-            NULL, /* .window */
+            nullptr, /* .window */
             "Ball Labyrinth", /* .title */
             message.c_str(), /* .message */
             SDL_arraysize(buttons), /* .numbuttons */
             buttons,
-            NULL /* .buttons */
+            nullptr /* .buttons */
     };
     int buttonid;
     if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
@@ -137,8 +137,8 @@ int main(int argc, char *argv[]) {
 
         physics.addWalls(collisionGeometryFilePath);
 
-        double xAxisRotation = 0.0; /**< x rotation of labyrinth. */
-        double yAxisRotation = 0.0; /**< y rotation of labyrinth. */
+        float xAxisRotation = 0.0; /**< x rotation of labyrinth. */
+        float yAxisRotation = 0.0; /**< y rotation of labyrinth. */
 
         bool upKeyPressed, downKeyPressed, leftKeyPressed, rightKeyPressed; /**< State variables for key pressed check. */
         upKeyPressed = downKeyPressed = leftKeyPressed = rightKeyPressed = false;
