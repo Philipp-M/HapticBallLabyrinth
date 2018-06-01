@@ -1,3 +1,5 @@
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <tiny_obj_loader.hpp>
 #include <iostream>
 #include <glm/gtx/rotate_vector.hpp>
@@ -89,7 +91,7 @@ void GraphicsModel::draw(ShaderProgram &shaderProgram) {
 //  glEnableVertexAttribArray(shaderProgram.attributeLocation("texCoord"));
 //  shaderProgram.vertexAttribPointer("texCoord", 2, GL_FLOAT, sizeof(Vertex3), (void *) (3 * sizeof(glm::vec3)), false);
     shaderProgram.setMatrixUniform4f("modelMatrix", getModelMatrix());
-    shaderProgram.setMatrixUniform3f("normalMatrix", glm::mat3(getModelMatrix()));
+    shaderProgram.setMatrixUniform3f("normalMatrix", glm::mat3(glm::transpose(glm::inverse(getModelMatrix()))));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 

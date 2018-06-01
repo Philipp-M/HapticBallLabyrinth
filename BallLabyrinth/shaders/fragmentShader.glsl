@@ -2,7 +2,6 @@
 #define MAX_LIGHTS 10
 
 uniform mat4 modelMatrix;
-uniform mat3 normalMatrix;
 uniform vec3 cameraPosition;
 
 uniform int numPointLights;
@@ -34,9 +33,8 @@ void main()
 {
 	FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 	vec4 tmpColor = vec4(diffuseColor, 1.0);
-
-    vec3 normal = normalize(normalMatrix * vNormal);
-	vec3 pos = vec3(modelMatrix * vec4(vPosition, 1));
+    vec3 normal = vNormal;
+    vec3 pos = vPosition;
 
     for(int i=0; i<numPointLights; ++i) {
         vec3 posToLight = allPointLights[i].position - pos;
@@ -61,9 +59,9 @@ void main()
         }
 
         float attenuation = 1.0 / (1.0 + allPointLights[i].attenuation * disToLight * disToLight);
-//        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * (ambientLight + difLight + specLight), 0.0);
-        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * difLight, 0.0);
-        FragColor += vec4(specLight + ambientLight, 0.0);
+        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * (ambientLight + difLight + specLight), 0.0);
+//        FragColor += vec4(attenuation * allPointLights[i].colorIntensity * difLight, 0.0);
+//        FragColor += vec4(specLight + ambientLight, 0.0);
     }
 }
 /*#version 330

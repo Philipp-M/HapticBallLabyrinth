@@ -1,5 +1,6 @@
-#include "Physics.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
 
+#include "Physics.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include <glm/ext.hpp>
 
@@ -201,7 +202,7 @@ void Physics::addWalls(std::string file) {
             } else {
                 float x1, y1, x2, y2;
                 in >> x1 >> y1 >> x2 >> y2;
-                walls.push_back(StaticObject(x1, y1, x2, y2, floorheight, wallheight, wallwidth));
+                walls.emplace_back(x1, y1, x2, y2, floorheight, wallheight, wallwidth);
             }
         }
         myfile.close();

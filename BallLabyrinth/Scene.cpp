@@ -1,7 +1,7 @@
 //
 // Created by steve on 1/5/17.
 //
-
+#include <memory>
 #include <tiny_obj_loader.hpp>
 #include <iostream>
 #include "Scene.hpp"
@@ -16,19 +16,19 @@ void Scene::loadObjFile(std::string filename, std::string &materialRefFolder) {
         if(MaterialManager::getInstance().getByName(m.name) == nullptr) {
             std::cout << m.name << " diffuse: " << m.diffuse[0] << "/" << m.diffuse[1] << "/" << m.diffuse[2]
                       << std::endl;
-            MaterialManager::getInstance().addMaterial(std::shared_ptr<Material>(
-                    new Material(m.name, Material::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]),
-                                 Material::Color(m.specular[0], m.specular[1], m.specular[2]), m.shininess)));
+            MaterialManager::getInstance().addMaterial(std::make_shared<Material>(
+                    m.name, Material::Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]),
+                                 Material::Color(m.specular[0], m.specular[1], m.specular[2]), m.shininess));
         }
     }
 
     for (auto &object: objectShape) {
-        if (object.mesh.material_ids.size() > 0) {
-            models.push_back(std::shared_ptr<GraphicsModel>(new GraphicsModel(object.mesh, object.name,
+        if (!object.mesh.material_ids.empty()) {
+            models.push_back(std::make_shared<GraphicsModel>(object.mesh, object.name,
                                                                               MaterialManager::getInstance().getByName(
-                                                                                      objectMaterial[object.mesh.material_ids[0]].name))));
+                                                                                      objectMaterial[object.mesh.material_ids[0]].name)));
         } else {
-            models.push_back(std::shared_ptr<GraphicsModel>(new GraphicsModel(object.mesh, object.name)));
+            models.push_back(std::make_shared<GraphicsModel>(object.mesh, object.name));
         }
     }
 }
@@ -39,11 +39,11 @@ Scene::Scene(std::vector<std::string> &objFilePaths, std::string &materialRefFol
         loadObjFile(filePath, materialRefFolder);
     }
 
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(10.0, 30.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(-10.0, 30.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 1.0, 0.2)));
-    lights.push_back(std::shared_ptr<PointLight>(new PointLight(glm::vec3(0.0, 60.0, 0.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 1500, 1.0, 0.2)));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(10.0, 60.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 0.3, 0.2));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(-10.0, 60.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 0.3, 0.2));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(10.0, 60.0, -10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 0.3, 0.2));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(-10.0, 60.0, 10.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 150, 0.3, 0.2));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(0.0, 60.0, 0.0), Material::Color(glm::vec3(1.0, 1.0, 1.0)), 1500, 0.3, 0.2));
 }
 
 void Scene::resetSceneWithNewLabyrinth(std::string &objFilePaths, std::string &materialRefFolder) {
@@ -88,7 +88,7 @@ void Scene::draw(ShaderProgram &shaderProgram) {
     shaderProgram.setUniform3f("cameraPosition", camera.getPosition());
     shaderProgram.setUniform1i("numPointLights", lights.size());
 
-    for(int i=0; i<lights.size(); i++) {
+    for(int i = 0; i<lights.size(); i++) {
         lights[i]->addToShader(shaderProgram, i);
     }
 
