@@ -1,0 +1,2 @@
+updatedPos * 0.01176 - 5.01933; // Device 1
+updatedPos * 0.01183 - 1.49819; // Device 4
