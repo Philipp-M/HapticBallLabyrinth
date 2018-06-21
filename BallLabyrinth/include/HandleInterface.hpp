@@ -1,5 +1,4 @@
 #pragma once
-#include "SimpleSerialBoost.hpp"
 #include <thread>
 #include <mutex>
 

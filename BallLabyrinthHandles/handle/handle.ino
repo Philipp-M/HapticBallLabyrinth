@@ -126,8 +126,8 @@ void calPosMeter()
 {
  // Add the function displacement & speed calculation
   double rh = 60;   //[mm]
-  double ts = 0.01176 * updatedPos - 5.01933; // Device 1
-  //double ts = 0.01183 * updatedPos - 1.49819; // Device 4
+  //double ts = 0.01176 * updatedPos - 5.01933; // Device 1
+  double ts = 0.01183 * updatedPos - 1.49819; // Device 4
   xh_prev = xh;
   xh = rh * (ts * 3.14159 / 180); // Compute the position of the handle based on ts
   vh = (xh - xh_prev) / .0001;

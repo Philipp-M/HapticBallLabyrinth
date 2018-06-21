@@ -245,37 +245,44 @@ main(int argc, char* argv[])
                 }
             }
 
-            if (upKeyPressed)
-            {
-                if (xAxisRotation > -MAX_ROTATION)
-                {
-                    xAxisRotation -= ROTATION_STEP;
-                }
-            }
+            xAxisRotation = handleInterface.getPos1() / 10.0;
+            yAxisRotation = -handleInterface.getPos2() / 10.0;
 
-            if (downKeyPressed)
-            {
-                if (xAxisRotation < MAX_ROTATION)
-                {
-                    xAxisRotation += ROTATION_STEP;
-                }
-            }
+            /* if (upKeyPressed) */
+            /* { */
+            /*     if (xAxisRotation > -MAX_ROTATION) */
+            /*     { */
+            /*         xAxisRotation -= ROTATION_STEP; */
+            /*         std::cout << "xaxis: " << xAxisRotation << std::endl; */
+            /*     } */
+            /* } */
 
-            if (leftKeyPressed)
-            {
-                if (yAxisRotation < MAX_ROTATION)
-                {
-                    yAxisRotation += ROTATION_STEP;
-                }
-            }
+            /* if (downKeyPressed) */
+            /* { */
+            /*     if (xAxisRotation < MAX_ROTATION) */
+            /*     { */
+            /*         xAxisRotation += ROTATION_STEP; */
+            /*         std::cout << "xaxis: " << xAxisRotation << std::endl; */
+            /*     } */
+            /* } */
 
-            if (rightKeyPressed)
-            {
-                if (yAxisRotation > -MAX_ROTATION)
-                {
-                    yAxisRotation -= ROTATION_STEP;
-                }
-            }
+            /* if (leftKeyPressed) */
+            /* { */
+            /*     if (yAxisRotation < MAX_ROTATION) */
+            /*     { */
+            /*         yAxisRotation += ROTATION_STEP; */
+            /*         std::cout << "yaxis: " << yAxisRotation << std::endl; */
+            /*     } */
+            /* } */
+
+            /* if (rightKeyPressed) */
+            /* { */
+            /*     if (yAxisRotation > -MAX_ROTATION) */
+            /*     { */
+            /*         yAxisRotation -= ROTATION_STEP; */
+            /*         std::cout << "yaxis: " << yAxisRotation << std::endl; */
+            /*     } */
+            /* } */
 
             glMain.resetModelRotationAroundAxis(0);
             glMain.resetModelRotationAroundAxis(1);
