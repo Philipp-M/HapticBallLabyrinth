@@ -7,7 +7,7 @@
 #include <thread>
 #include <cmath>
 #include "Physics.hpp"
-#include "SerialCommunication.hpp"
+#include "HandleInterface.hpp"
 #include "GLMain.hpp"
 
 #define PROGRAM_NAME "Ball Labyrinth"
@@ -90,6 +90,7 @@ showMessageBox(float elapsedTime)
 int
 main(int argc, char* argv[])
 {
+    assert(argc == 3);
     SDL_Window*   mainwindow;  /**< Window handle. */
     SDL_GLContext maincontext; /**< Opengl context handle. */
 
@@ -146,7 +147,11 @@ main(int argc, char* argv[])
     GLMain glMain(mainwindow, maincontext, objFilePaths, materialFolder);
 
     showMessageBox(0.0);
-    SerialCommunication serCom;
+
+
+    /** Start Handle communication **/
+
+    HandleInterface handleInterface(500000, std::string(argv[1]), std::string(argv[2]));
 
     while (!quit)
     {
@@ -183,7 +188,7 @@ main(int argc, char* argv[])
         /** Game loop */
         while (!quit && physics.inGame())
         {
-            serCom.communicate();
+            std::cout << "handle1: "<< handleInterface.getPos1() << ", handle2: "<< handleInterface.getPos2() << std::endl;
             /** Update graphics model according to calculated positions and rotations of physics. */
             physics.updateGraphicsModel();
             /** Draw graphics object. */
@@ -312,6 +317,7 @@ main(int argc, char* argv[])
 
         glMain.initializeNewLabyrinth(labyrinthObjFilePath, materialFolder);
     }
+    handleInterface.quit = true;
 
     /** Clear glMain */
     glMain.clearOpenGLSceneAndShaderProgram();

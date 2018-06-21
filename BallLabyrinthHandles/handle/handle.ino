@@ -126,9 +126,8 @@ void calPosMeter()
 {
  // Add the function displacement & speed calculation
   double rh = 60;   //[mm]
-  //double ts = 0.01231 * updatedPos - 2.37275; // Compute the angle of the sector pulley (ts) in degrees based on updatedPos
-  double ts = 0.01207 * updatedPos - 6.49203; // dev 1
-  //double ts = 0.01181 * updatedPos - 2.11106; // dev 4
+  double ts = 0.01176 * updatedPos - 5.01933; // Device 1
+  //double ts = 0.01183 * updatedPos - 1.49819; // Device 4
   xh_prev = xh;
   xh = rh * (ts * 3.14159 / 180); // Compute the position of the handle based on ts
   vh = (xh - xh_prev) / .0001;

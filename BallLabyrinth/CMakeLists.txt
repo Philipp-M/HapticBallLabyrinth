@@ -35,7 +35,8 @@ find_package(Boost 1.36.0 COMPONENTS thread filesystem system)
 set(SOURCE_FILES Shader.cpp
         include/SimpleSerial.hpp
         include/SerialCommunication.hpp
-        SerialCommunication.cpp
+        include/HandleInterface.hpp
+        HandleInterface.cpp
         include/Shader.hpp
         ShaderProgram.cpp
         include/ShaderProgram.hpp
