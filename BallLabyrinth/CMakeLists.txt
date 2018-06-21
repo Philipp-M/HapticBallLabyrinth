@@ -27,10 +27,10 @@ find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 
 # find BOOST
-# set(Boost_USE_MULTITHREADED      ON)
-# set(Boost_USE_STATIC_RUNTIME    OFF)
-# 
-# find_package(Boost 1.36.0 COMPONENTS thread filesystem system)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+ 
+find_package(Boost 1.36.0 COMPONENTS thread filesystem system)
 
 set(SOURCE_FILES Shader.cpp
         include/SimpleSerial.hpp
@@ -62,7 +62,7 @@ target_include_directories(BallLabyrinth PUBLIC
         ${GLEW_INCLUDE_DIRS}
         ${OpenGL_INCLUDE_DIRS}
         ${SDL2_INCLUDE_DIR}
-        # ${Boost_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
         )
 
 target_link_libraries(BallLabyrinth
@@ -71,5 +71,5 @@ target_link_libraries(BallLabyrinth
         ${GLEW_LIBRARIES}
         ${SDL2_LIBRARY}
         ${SDL2_IMAGE_LIBRARY}
-        # ${Boost_LIBRARIES}
+        ${Boost_LIBRARIES}
         )

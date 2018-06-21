@@ -55,6 +55,23 @@ public:
         }
     }
 
+    int readValInt()
+    {
+        using namespace boost;
+        int retVal;
+        char buffer[4];
+        asio::read(serial, asio::buffer(buffer, 4));
+        ((char*)&retVal)[0] = buffer[0];
+        ((char*)&retVal)[1] = buffer[1];
+        ((char*)&retVal)[2] = buffer[2];
+        ((char*)&retVal)[3] = buffer[3];
+        /* ((char*)&retVal)[3] = buffer[4]; */
+        /* ((char*)&retVal)[2] = buffer[5]; */
+        /* ((char*)&retVal)[1] = buffer[6]; */
+        /* ((char*)&retVal)[0] = buffer[7]; */
+        return retVal;
+    }
+
 private:
     boost::asio::io_service  io;
     boost::asio::serial_port serial;
