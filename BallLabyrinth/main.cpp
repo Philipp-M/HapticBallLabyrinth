@@ -7,6 +7,7 @@
 #include <thread>
 #include <cmath>
 #include "Physics.hpp"
+#include "SerialCommunication.hpp"
 #include "GLMain.hpp"
 
 #define PROGRAM_NAME "Ball Labyrinth"
@@ -145,9 +146,11 @@ main(int argc, char* argv[])
     GLMain glMain(mainwindow, maincontext, objFilePaths, materialFolder);
 
     showMessageBox(0.0);
+    SerialCommunication serCom;
 
     while (!quit)
     {
+
         SDL_Event event;
 
         /** Create physics object and add collision models. */
@@ -180,6 +183,7 @@ main(int argc, char* argv[])
         /** Game loop */
         while (!quit && physics.inGame())
         {
+            serCom.communicate();
             /** Update graphics model according to calculated positions and rotations of physics. */
             physics.updateGraphicsModel();
             /** Draw graphics object. */
