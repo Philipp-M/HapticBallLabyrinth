@@ -33,7 +33,6 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost 1.36.0 COMPONENTS thread filesystem system)
 
 set(SOURCE_FILES Shader.cpp
-        include/SimpleSerial.hpp
         include/SerialCommunication.hpp
         include/HandleInterface.hpp
         HandleInterface.cpp
