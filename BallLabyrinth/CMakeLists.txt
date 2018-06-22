@@ -34,6 +34,7 @@ find_package(Boost 1.36.0 COMPONENTS thread filesystem system)
 
 set(SOURCE_FILES Shader.cpp
         include/SerialCommunication.hpp
+        include/HapticForceManager.hpp
         include/HandleInterface.hpp
         HandleInterface.cpp
         include/Shader.hpp

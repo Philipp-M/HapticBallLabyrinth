@@ -151,15 +151,16 @@ main(int argc, char* argv[])
 
     /** Start Handle communication **/
 
-    HandleInterface handleInterface(500000, std::string(argv[1]), std::string(argv[2]));
+    HandleInterface    handleInterface(500000, std::string(argv[1]), std::string(argv[2]));
+    HapticForceManager hapticForceManager(handleInterface);
+    handleInterface.setHapticForceManager(&hapticForceManager);
 
     while (!quit)
     {
-
         SDL_Event event;
 
         /** Create physics object and add collision models. */
-        Physics physics(DELTA_TIME);
+        Physics physics(hapticForceManager, DELTA_TIME);
         physics.addBall(glMain.getScene()->getModelByName("Ball"),
                         BALL_MASS,
                         BALL_RADIUS,
@@ -170,6 +171,9 @@ main(int argc, char* argv[])
 
         float xAxisRotation = 0.0; /**< x rotation of labyrinth. */
         float yAxisRotation = 0.0; /**< y rotation of labyrinth. */
+
+        std::map<int, bool> keyMap;
+        std::map<int, bool> oldKeyMap;
 
         bool upKeyPressed, downKeyPressed, leftKeyPressed,
             rightKeyPressed; /**< State variables for key pressed check. */
@@ -188,13 +192,15 @@ main(int argc, char* argv[])
         /** Game loop */
         while (!quit && physics.inGame())
         {
-            std::cout << "handle1: "<< handleInterface.getPos1() << ", handle2: "<< handleInterface.getPos2() << std::endl;
+            std::cout << "handle1: " << handleInterface.getPos1()
+                      << ", handle2: " << handleInterface.getPos2() << std::endl;
             /** Update graphics model according to calculated positions and rotations of physics. */
             physics.updateGraphicsModel();
             /** Draw graphics object. */
             glMain.display();
             SDL_GL_SwapWindow(mainwindow);
 
+            oldKeyMap = keyMap;
             /** Check for events. */
             while (SDL_PollEvent(&event))
             {
@@ -204,40 +210,11 @@ main(int argc, char* argv[])
                         quit = true;
                         break;
                     case SDL_KEYDOWN:
-                        switch (event.key.keysym.sym)
-                        {
-                            case SDLK_UP:
-                                upKeyPressed = true;
-                                break;
-                            case SDLK_DOWN:
-                                downKeyPressed = true;
-                                break;
-                            case SDLK_LEFT:
-                                leftKeyPressed = true;
-                                break;
-                            case SDLK_RIGHT:
-                                rightKeyPressed = true;
-                                break;
-                            case SDLK_q:
-                                quit = true;
-                        }
+                        keyMap[event.key.keysym.sym] = true;
                         break;
                     case SDL_KEYUP:
-                        switch (event.key.keysym.sym)
-                        {
-                            case SDLK_UP:
-                                upKeyPressed = false;
-                                break;
-                            case SDLK_DOWN:
-                                downKeyPressed = false;
-                                break;
-                            case SDLK_LEFT:
-                                leftKeyPressed = false;
-                                break;
-                            case SDLK_RIGHT:
-                                rightKeyPressed = false;
-                                break;
-                        }
+                        keyMap[event.key.keysym.sym] = false;
+                        break;
                     case SDL_WINDOWEVENT:
                         if (event.window.event == SDL_WINDOWEVENT_RESIZED)
                             glMain.reshape(event.window.data1, event.window.data2);
@@ -245,44 +222,54 @@ main(int argc, char* argv[])
                 }
             }
 
-            xAxisRotation = handleInterface.getPos1() / 10.0;
+            quit = keyMap[SDLK_q];
+
+
+            xAxisRotation = -handleInterface.getPos1() / 10.0;
             yAxisRotation = -handleInterface.getPos2() / 10.0;
 
-            /* if (upKeyPressed) */
-            /* { */
-            /*     if (xAxisRotation > -MAX_ROTATION) */
-            /*     { */
-            /*         xAxisRotation -= ROTATION_STEP; */
-            /*         std::cout << "xaxis: " << xAxisRotation << std::endl; */
-            /*     } */
-            /* } */
+            if (keyMap[SDLK_UP])
+            {
+                if (xAxisRotation > -MAX_ROTATION)
+                {
+                    xAxisRotation -= ROTATION_STEP;
+                    std::cout << "xaxis: " << xAxisRotation << std::endl;
+                }
+            }
 
-            /* if (downKeyPressed) */
-            /* { */
-            /*     if (xAxisRotation < MAX_ROTATION) */
-            /*     { */
-            /*         xAxisRotation += ROTATION_STEP; */
-            /*         std::cout << "xaxis: " << xAxisRotation << std::endl; */
-            /*     } */
-            /* } */
+            if (keyMap[SDLK_DOWN])
+            {
+                if (xAxisRotation < MAX_ROTATION)
+                {
+                    xAxisRotation += ROTATION_STEP;
+                    std::cout << "xaxis: " << xAxisRotation << std::endl;
+                }
+            }
 
-            /* if (leftKeyPressed) */
-            /* { */
-            /*     if (yAxisRotation < MAX_ROTATION) */
-            /*     { */
-            /*         yAxisRotation += ROTATION_STEP; */
-            /*         std::cout << "yaxis: " << yAxisRotation << std::endl; */
-            /*     } */
-            /* } */
+            if (keyMap[SDLK_LEFT])
+            {
+                if (yAxisRotation < MAX_ROTATION)
+                {
+                    yAxisRotation += ROTATION_STEP;
+                    std::cout << "yaxis: " << yAxisRotation << std::endl;
+                }
+            }
 
-            /* if (rightKeyPressed) */
-            /* { */
-            /*     if (yAxisRotation > -MAX_ROTATION) */
-            /*     { */
-            /*         yAxisRotation -= ROTATION_STEP; */
-            /*         std::cout << "yaxis: " << yAxisRotation << std::endl; */
-            /*     } */
-            /* } */
+            if (keyMap[SDLK_RIGHT])
+            {
+                if (yAxisRotation > -MAX_ROTATION)
+                {
+                    yAxisRotation -= ROTATION_STEP;
+                    std::cout << "yaxis: " << yAxisRotation << std::endl;
+                }
+            }
+
+            if (keyMap[SDLK_s] && !oldKeyMap[SDLK_s])
+                hapticForceManager.enableCenterSpring = !hapticForceManager.enableCenterSpring;
+            if (keyMap[SDLK_c] && !oldKeyMap[SDLK_c])
+                hapticForceManager.enableBallCollision = !hapticForceManager.enableBallCollision;
+            if (keyMap[SDLK_w] && !oldKeyMap[SDLK_w])
+                hapticForceManager.enableWalls = !hapticForceManager.enableWalls;
 
             glMain.resetModelRotationAroundAxis(0);
             glMain.resetModelRotationAroundAxis(1);

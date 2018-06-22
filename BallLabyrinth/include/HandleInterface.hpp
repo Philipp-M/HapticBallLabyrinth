@@ -2,6 +2,8 @@
 #include <thread>
 #include <mutex>
 
+class HapticForceManager;
+
 class HandleInterface {
 private:
     size_t baud;
@@ -12,7 +14,8 @@ private:
     double pos1;
     double pos2;
     std::thread thread;
-    mutable std::mutex mutex;
+    mutable std::recursive_mutex mutex;
+    HapticForceManager* hapticForceManager;
     void run();
 
     void setPos1(double pos);
@@ -25,8 +28,13 @@ public:
     double getPos1();
     double getPos2();
 
+    double getForce1();
+    double getForce2();
+
     void setForce1(double force);
     void setForce2(double force);
+
+    void setHapticForceManager(HapticForceManager* manager);
 
     bool quit;
 };

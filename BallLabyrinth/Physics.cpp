@@ -93,12 +93,26 @@ Physics::Ball::updateCollisionImpulse(Physics::Collision& collision)
 
     float j = numerator / denominator;
     velocity += j * collision.collisionNormal / mass;
+    auto impulse = j * collision.collisionNormal;
+    if (std::abs(impulse.x * velocity.x) > 0.1f || std::abs(impulse.y * velocity.y) > 0.1f)
+    {
+        wallCollisionCount = 0;
+        glm::vec2 force(-std::abs(impulse.y) * velocity.y / 10000.0f,
+                        std::abs(impulse.x) * velocity.x / 10000.0f);
+        hapticForceManager.setBallCollisionForce(force);
+    }
+    /* std::cout << glm::to_string(impulseXY) << std::endl; */
+
     omega += inverseInertiaTensor * glm::cross(rBall, (j * collision.collisionNormal));
 }
 
 void
 Physics::Ball::updatePhysics(float dt, glm::vec3 earthAcceleration)
 {
+    if (wallCollisionCount++ > 16)
+    {
+        hapticForceManager.setBallCollisionForce(glm::vec2(0.0f, 0.0f));
+    }
     // calculate rolling resistance
     float forceRoll = rollingFrictionCoefficient * std::abs(earthAcceleration.z) * mass;
 
@@ -214,8 +228,13 @@ Physics::Ball::updateGraphicsModel()
     }
 }
 
-Physics::Physics(float dt)
-: dt(dt), quit(false), earthAcceleration(0.0, 0.0, -EARTH_ACCEL), pitch(0.0), yaw(0.0)
+Physics::Physics(HapticForceManager& hapticForceManager, float dt)
+: hapticForceManager(hapticForceManager)
+, dt(dt)
+, quit(false)
+, earthAcceleration(0.0, 0.0, -EARTH_ACCEL)
+, pitch(0.0)
+, yaw(0.0)
 {
 }
 
@@ -226,7 +245,8 @@ Physics::addBall(std::shared_ptr<GraphicsModel> model,
                  float                          collisionEpsilon,
                  float                          rollingFriction)
 {
-    ballObjects.emplace_back(Ball(model, mass, radius, collisionEpsilon, rollingFriction));
+    ballObjects.emplace_back(
+        Ball(hapticForceManager, model, mass, radius, collisionEpsilon, rollingFriction));
 }
 
 void

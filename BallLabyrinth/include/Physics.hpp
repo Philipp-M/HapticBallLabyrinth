@@ -22,6 +22,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "GraphicsModel.hpp"
+#include "HapticForceManager.hpp"
 
 #define EARTH_ACCEL 981.0 /**< Earth acceleration constant in cm/s^2 */
 
@@ -33,22 +34,27 @@ static std::mutex lock;
 /**
  * Class handling the whole physics of the game, including collisions.
  */
-class Physics {
+class Physics
+{
 public:
     /**
      * Struct representing a collision.
      */
-    struct Collision {
-        bool collision = false; /**< Indicates if collision detected. */
-        glm::vec3 collisionNormal; /**< Normal pointing from second object (wall) to first object (ball). */
-        float distance; /**< Distance between collision point and sphere center. */
+    struct Collision
+    {
+        bool      collision = false; /**< Indicates if collision detected. */
+        glm::vec3 collisionNormal;   /**< Normal pointing from second object (wall) to first object
+                                        (ball). */
+        float distance;              /**< Distance between collision point and sphere center. */
     };
 
     /**
      * Struct representing a static rigid body object as AABB box.
-     * AABB box according to: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+     * AABB box according to:
+     * https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
      */
-    struct StaticObject {
+    struct StaticObject
+    {
         glm::vec3 edgepointMin; /**< Minimum point of box in physics coordination system. */
         glm::vec3 edgepointMax; /**< Maximum point of box in physics coordination system. */
 
@@ -62,50 +68,83 @@ public:
          * @param wallheight height of labyrinth walls.
          * @param wallwidth width of labyrinth walls, used to generate AABB box.
          */
-        StaticObject(float x1, float y1, float x2, float y2, float floorheight, float wallheight, float wallwidth);
+        StaticObject(float x1,
+                     float y1,
+                     float x2,
+                     float y2,
+                     float floorheight,
+                     float wallheight,
+                     float wallwidth);
     };
 
     /**
      * Struct representing a ball as rigid body.
      */
-    struct Ball {
-        std::shared_ptr<GraphicsModel> graphicsModel; /**< Pointer to graphicsModel object, which represents this ball visually. */
+    struct Ball
+    {
+        HapticForceManager&            hapticForceManager;
+        std::shared_ptr<GraphicsModel> graphicsModel; /**< Pointer to graphicsModel object, which
+                                                         represents this ball visually. */
 
-        float mass; /**< Mass of ball in kilo gramm. */
-        float radius; /**< Radius of ball in centimeters. */
-        float collisionEpsilon; /**< Constant to describe collision type, it should be between 0.0 and 1.0. */
-        float rollingFrictionCoefficient; /**< Constant used to calculate rolling friction */
-        glm::vec3 centerpoint; /**< Centerpoint of ball. */
+        float mass;             /**< Mass of ball in kilo gramm. */
+        float radius;           /**< Radius of ball in centimeters. */
+        float collisionEpsilon; /**< Constant to describe collision type, it should be between 0.0
+                                   and 1.0. */
+        float     rollingFrictionCoefficient; /**< Constant used to calculate rolling friction */
+        glm::vec3 centerpoint;                /**< Centerpoint of ball. */
 
-        glm::vec3 velocity; /**< Velocity for rigid body simulation. */
+        glm::vec3 velocity;        /**< Velocity for rigid body simulation. */
         glm::vec3 angularMomentum; /**< Angular momentum for rigid body simulation. */
-        glm::vec3 omega; /**< Angular velocity for rigid body simulation. */
+        glm::vec3 omega;           /**< Angular velocity for rigid body simulation. */
 
-        float rotationAngleSimple;
+        float     rotationAngleSimple;
         glm::vec3 rotationAxisSimple;
         glm::mat4 rotationMatGraphicsModel;
 
-        glm::mat3 rotation; /**< Rotation matrix for rigid body simulation. */
+        glm::mat3 rotation;             /**< Rotation matrix for rigid body simulation. */
         glm::mat3 inverseInertiaTensor; /**< Inverse of inertia tensor for rigid body simulation. */
-        glm::vec3 torque; /**< Torque for rigid body simulation. */
+        glm::vec3 torque;               /**< Torque for rigid body simulation. */
 
         glm::vec3 force; /**< Force acting on rigid body. */
 
+        size_t wallCollisionCount;
+
         /**
          * Constructor for rigid body ball object.
+         * @param handleInterface interface for the haptic handle
          * @param model Graphical model, which represents the ball visually.
          * @param mass Mass of ball.
          * @param radius Radius of ball.
-         * @param collisionEpsilon Constant describing the type of physical collision, should be between 0.0 and 1.0.
+         * @param collisionEpsilon Constant describing the type of physical collision, should be
+         * between 0.0 and 1.0.
          * @param rollingFriction Constant used to calculate the rolling friction.
          */
-        Ball(std::shared_ptr<GraphicsModel> &model, float mass, float radius, float collisionEpsilon, float rollingFriction) :
-                graphicsModel(model), mass(mass), radius(radius), collisionEpsilon(collisionEpsilon),
-                rollingFrictionCoefficient(rollingFriction), velocity(0.0),angularMomentum(0.0), omega(0.0), rotation(1.0),
-                torque(0.0), force(0.0, 0.0, 0.0), rotationAngleSimple(0.0), rotationAxisSimple(0.0, 0.0, 0.0), rotationMatGraphicsModel(1.0) {
+        Ball(HapticForceManager&             hapticForceManager,
+             std::shared_ptr<GraphicsModel>& model,
+             float                           mass,
+             float                           radius,
+             float                           collisionEpsilon,
+             float                           rollingFriction)
+        : hapticForceManager(hapticForceManager)
+        , graphicsModel(model)
+        , mass(mass)
+        , radius(radius)
+        , collisionEpsilon(collisionEpsilon)
+        , rollingFrictionCoefficient(rollingFriction)
+        , velocity(0.0)
+        , angularMomentum(0.0)
+        , omega(0.0)
+        , rotation(1.0)
+        , torque(0.0)
+        , force(0.0, 0.0, 0.0)
+        , rotationAngleSimple(0.0)
+        , rotationAxisSimple(0.0, 0.0, 0.0)
+        , rotationMatGraphicsModel(1.0)
+        {
             calculateInverseInertiaTensor();
 
-            /** Calculate centerpoint of physical model, depending on the centerpoint of the graphical model. */
+            /** Calculate centerpoint of physical model, depending on the centerpoint of the
+             * graphical model. */
             glm::vec4 tmp = model->getModelMatrix() * glm::vec4(model->getCentroid(), 1.0);
             centerpoint.x = tmp.x;
             centerpoint.y = tmp.z;
@@ -120,22 +159,25 @@ public:
         /**
          * Check if ball collides with wall.
          * @param wall Static AABB box for which it is checked if collision happended.
-         * @return Collision object, in which the bool collision is set to true, if collision happened.
+         * @return Collision object, in which the bool collision is set to true, if collision
+         * happened.
          */
-        Collision collisionCheck(const StaticObject &wall);
+        Collision collisionCheck(const StaticObject& wall);
 
         /**
          * Translates the centerpoint of the ball along the collision normal to the position,
-         * where the collision distance is equal to the radius of the ball (only collision in one point).
+         * where the collision distance is equal to the radius of the ball (only collision in one
+         * point).
          * @param collision Object of collision,
          */
-        void resetPosition(Collision &collision);
+        void resetPosition(Collision& collision);
 
         /**
-         * Updates the velocity and the angular velocity of the ball, according to the rigid body collision impulse.
+         * Updates the velocity and the angular velocity of the ball, according to the rigid body
+         * collision impulse.
          * @param collision Object of collision.
          */
-        void updateCollisionImpulse(Collision &collision);
+        void updateCollisionImpulse(Collision& collision);
 
         /**
          * Calculates one rigid body step using the symplectic Euler.
@@ -145,40 +187,52 @@ public:
         void updatePhysics(float dt, glm::vec3 earthAcceleration);
 
         /**
-         * Updates the graphic model according to the new calculated positions and rotations in the physics simulation.
+         * Updates the graphic model according to the new calculated positions and rotations in the
+         * physics simulation.
          */
         void updateGraphicsModel();
     };
 
 
 private:
-    std::chrono::duration<float> dt; /**< Delta time, in which one physics step should be calculated. */
-    float dtElapsed; /**< The actual time, which the previous step took, used for next physics update. */
-    bool quit; /**< Used to shutdown physics thread. */
+    HapticForceManager& hapticForceManager;
+    std::chrono::duration<float>
+          dt;        /**< Delta time, in which one physics step should be calculated. */
+    float dtElapsed; /**< The actual time, which the previous step took, used for next physics
+                        update. */
+    bool      quit;  /**< Used to shutdown physics thread. */
     glm::vec3 earthAcceleration; /**< Vector describing the earth acceleration. */
-    float pitch, yaw; /**< Angles describing the rotation of the labyrinth. Instead of rotating the whole mesh, only the earthAcceleration is rotated.*/
+    float pitch, yaw; /**< Angles describing the rotation of the labyrinth. Instead of rotating the
+                         whole mesh, only the earthAcceleration is rotated.*/
     std::vector<Ball> ballObjects; /**< Container holding all ball objects in the scene */
-    std::vector<StaticObject> walls; /**< Container holding all walls and static objects as AABB boxes. */
+    std::vector<StaticObject>
+        walls; /**< Container holding all walls and static objects as AABB boxes. */
 
 public:
     /**
      * Constructor for game physics.
      * @param dt Delta time in which one physics step should be calculated.
      */
-    Physics(float dt = 0.001);
+    Physics(HapticForceManager& hapticForceManager, float dt = 0.001);
 
     /**
      * Adds ball to physics scene.
      * @param model Graphical model for this physical ball object.
      * @param mass Mass of ball in kg.
      * @param radius Radius of ball in mm.
-     * @param collisionEpsilon Constant describing the type of physical collision, should be between 0.0 and 1.0.
+     * @param collisionEpsilon Constant describing the type of physical collision, should be between
+     * 0.0 and 1.0.
      * @param rollingFriction Constant used to calculate the rolling friction.
      */
-    void addBall(std::shared_ptr<GraphicsModel> model, float mass, float radius, float collisionEpsilon, float rollingFriction);
+    void addBall(std::shared_ptr<GraphicsModel> model,
+                 float                          mass,
+                 float                          radius,
+                 float                          collisionEpsilon,
+                 float                          rollingFriction);
 
     /**
-     * Loads file for collision geometries and adds AABB boxes for all walls and the floor of the labyrinth.
+     * Loads file for collision geometries and adds AABB boxes for all walls and the floor of the
+     * labyrinth.
      * @param file Path to file in which the collision geometries are indicated.
      */
     void addWalls(std::string file);
@@ -191,30 +245,31 @@ public:
     void rotateEarthAccelerationXY(float pitch, float yaw);
 
     /**
-     * Checks if there are collisions and updates the position, the velocity and the angular velocity of the ball object.
+     * Checks if there are collisions and updates the position, the velocity and the angular
+     * velocity of the ball object.
      */
     void handleCollisions();
 
     /**
      * Loop function called by the physics thread.
-     * Handles all collisions, updates the physics and let the thread sleep for the physics step time.
+     * Handles all collisions, updates the physics and let the thread sleep for the physics step
+     * time.
      */
     void update();
 
     /**
-     * Sets rotation and translation matrices of the graphics model according to the updated physics.
+     * Sets rotation and translation matrices of the graphics model according to the updated
+     * physics.
      */
     void updateGraphicsModel();
 
     /**
      * Returns centerpoint of ball.
      */
-     bool inGame() const;
+    bool inGame() const;
 
     /**
      * Let the physics thread leave the loop of the update function, ends physics calculation.
      */
     void quitPhysics();
 };
-
-

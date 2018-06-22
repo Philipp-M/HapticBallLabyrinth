@@ -80,22 +80,34 @@ private:
 
     void write_start(void)
     {  // Start an asynchronous write and call writeComplete when it completes or fails
-        boost::asio::async_write(serialPort,
-                                 boost::asio::buffer(&writeMsg.front(), 1),
-                                 boost::bind(&SerialCommunication::writeComplete,
-                                             this,
-                                             boost::asio::placeholders::error));
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        readStart();
+        if (writeMsg.size() >= 4)
+        {
+            char buffer[4];
+            buffer[0] = writeMsg.back();
+            writeMsg.pop_back();
+            buffer[1] = writeMsg.back();
+            writeMsg.pop_back();
+            buffer[2] = writeMsg.back();
+            writeMsg.pop_back();
+            buffer[3] = writeMsg.back();
+            writeMsg.pop_back();
+            boost::asio::async_write(serialPort,
+                                     boost::asio::buffer(buffer, 4),
+                                     boost::bind(&SerialCommunication::writeComplete,
+                                                 this,
+                                                 boost::asio::placeholders::error));
+            /* std::this_thread::sleep_for(std::chrono::milliseconds(7)); */
+        }
     }
 
     void writeComplete(const boost::system::error_code& error)
     {  // the asynchronous read operation has now completed or failed and returned an error
         if (!error)
         {                           // write completed, so send next write data
-            writeMsg.pop_front();   // remove the completed data
+            /* writeMsg.pop_front();   // remove the completed data */
             if (!writeMsg.empty())  // if there is anthing left to be written
                 write_start();      // then start sending the next item in the buffer
+            readStart();
         }
         else
             doClose(error);

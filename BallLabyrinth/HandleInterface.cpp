@@ -1,7 +1,9 @@
 #include "HandleInterface.hpp"
+#include "HapticForceManager.hpp"
 #include "SerialCommunication.hpp"
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#include <glm/glm.hpp>
 
 HandleInterface::HandleInterface(size_t baud, const std::string& dev1, const std::string& dev2)
 : quit(false)
@@ -13,6 +15,7 @@ HandleInterface::HandleInterface(size_t baud, const std::string& dev1, const std
 , pos1(0)
 , pos2(0)
 , thread(&HandleInterface::run, this)
+, hapticForceManager(nullptr)
 {
 }
 
@@ -48,12 +51,17 @@ HandleInterface::run()
         boost::thread t1(boost::bind(&boost::asio::io_service::run, &ioService1));
         boost::thread t2(boost::bind(&boost::asio::io_service::run, &ioService2));
         while (c1.active && c2.active && !quit)  // check the internal state of the connection
-                                                     // to make sure it's still running
+                                                 // to make sure it's still running
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(15));
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
             mutex.lock();
-            c1.write(static_cast<uint32_t>(force1 * 1000000));
-            c2.write(static_cast<uint32_t>(force2 * 1000000));
+            std::cout << "handle thread force1: " << force1 << "handle thread force2: " << force2
+                      << std::endl;
+            glm::vec2 force(0.0f, 0.0f);
+            if (hapticForceManager != nullptr)
+                force = hapticForceManager->getHandleForce();
+            c1.write(static_cast<int32_t>(force.x * 1000000));
+            c2.write(static_cast<int32_t>(force.y * 1000000));
             mutex.unlock();
         }
         c1.close();  // close the minicom client connection
@@ -73,41 +81,61 @@ HandleInterface::run()
 double
 HandleInterface::getPos1()
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     return pos1;
 }
 
 double
 HandleInterface::getPos2()
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     return pos2;
+}
+
+double
+HandleInterface::getForce1()
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex);
+    return force1;
+}
+
+double
+HandleInterface::getForce2()
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex);
+    return force2;
 }
 
 void
 HandleInterface::setForce1(double force)
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     force1 = force;
 }
 
 void
 HandleInterface::setForce2(double force)
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     force2 = force;
 }
 
 void
 HandleInterface::setPos1(double pos)
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     pos1 = pos;
 }
 
 void
 HandleInterface::setPos2(double pos)
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
     pos2 = pos;
+}
+
+void
+HandleInterface::setHapticForceManager(HapticForceManager* manager)
+{
+    hapticForceManager = manager;
 }
