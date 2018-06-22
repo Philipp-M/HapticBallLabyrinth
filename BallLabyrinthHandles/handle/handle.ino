@@ -28,22 +28,22 @@ const int flipThresh = 700;  // threshold to determine whether or not a flip ove
 boolean flipped = false;
 
 // Kinematics
-double xh = 0;         // position of the handle [m]
-double xh_prev = 0;
-double vh = 0;         //velocity of the handle
-double v[SIZE];
-double lastVh = 0;     //last velocity of the handle
-double lastLastVh = 0; //last last velocity of the handle
-double rp = 0.004191;   //[m]
-double rs = 0.073152;   //[m]
-double rh = 0.065659;   //[m]
+float xh = 0;         // position of the handle [m]
+float xh_prev = 0;
+float vh = 0;         //velocity of the handle
+float v[SIZE];
+float lastVh = 0;     //last velocity of the handle
+float lastLastVh = 0; //last last velocity of the handle
+float rp = 0.004191;   //[m]
+float rs = 0.073152;   //[m]
+float rh = 0.065659;   //[m]
 // Force output variables
-double force = 0;           // force at the handle
-double Tp = 0;              // torque of the motor pulley
-double duty = 0;            // duty cylce (between 0 and 255)
+float force = 0;           // force at the handle
+float Tp = 0;              // torque of the motor pulley
+float duty = 0;            // duty cylce (between 0 and 255)
 unsigned int output = 0;    // output command to the motor
 
-double sgn(double x) {
+float sgn(float x) {
   return x > 0 ? 1 : x < 0 ? -1 : 0;
 }
 
@@ -72,16 +72,28 @@ void setup() {
 
 bool readForce()
 {
-  uint32_t forcei = 0;
+  int32_t forcei = 0;
   if (Serial.available() < 4)
     return false;
-  Serial.readBytes((char*)&forcei, 4);
-  force = forcei / 1000000.0;
+  //char buffer[4];
+  //Serial.readBytes(buffer, 4);
+  // ((char*)&forcei)[3] = buffer[3];
+  // ((char*)&forcei)[2] = buffer[2];
+  // ((char*)&forcei)[1] = buffer[1];
+  // ((char*)&forcei)[0] = buffer[0];
+  ((char*)&forcei)[3] = Serial.read();
+  ((char*)&forcei)[2] = Serial.read();
+  ((char*)&forcei)[1] = Serial.read();
+  ((char*)&forcei)[0] = Serial.read();
+  force = (float)forcei / 1000000.0;
+  while (Serial.available() > 0)
+    Serial.read();
   return true;
 }
 
 void communication() {
   if (readForce()) {
+    //int32_t forcei = force;// * 1000000;
     int32_t xhi = xh * 1000000;
     Serial.write((const char*)&xhi, 4);
     Serial.flush();
@@ -125,9 +137,9 @@ void readPosCount() {
 void calPosMeter()
 {
  // Add the function displacement & speed calculation
-  double rh = 60;   //[mm]
-  //double ts = 0.01176 * updatedPos - 5.01933; // Device 1
-  double ts = 0.01183 * updatedPos - 1.49819; // Device 4
+  float rh = 60;   //[mm]
+  //float ts = 0.01176 * updatedPos - 5.01933; // Device 1
+  float ts = 0.01183 * updatedPos - 8.29819; // Device 4
   xh_prev = xh;
   xh = rh * (ts * 3.14159 / 180); // Compute the position of the handle based on ts
   vh = (xh - xh_prev) / .0001;
@@ -193,5 +205,5 @@ void loop() {
   communication();
   motorControl();
   // delay before next reading:
-  delay(3);
+  delay(1);
 }
