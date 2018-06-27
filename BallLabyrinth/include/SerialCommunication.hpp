@@ -118,11 +118,10 @@ private:
         if (error == boost::asio::error::operation_aborted)  // if this call is the result of a
                                                              // timer cancel()
             return;  // ignore it because the connection cancelled the timer
-        if (error)
-            std::cerr << "Error: " << error.message() << std::endl;  // show the error message
-        else
-            std::cout << "Error: Connection did not succeed.\n";
-        std::cout << "Press Enter to exit\n";
+        /* if (error) */
+        /*     std::cerr << "Error: " << error.message() << std::endl;  // show the error message */
+        /* else */
+        /*     std::cerr << "Error: Connection did not succeed.\n"; */
         serialPort.close();
         active = false;
     }

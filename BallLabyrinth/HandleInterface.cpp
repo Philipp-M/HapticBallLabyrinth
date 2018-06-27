@@ -55,8 +55,6 @@ HandleInterface::run()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
             mutex.lock();
-            std::cout << "handle thread force1: " << force1 << "handle thread force2: " << force2
-                      << std::endl;
             glm::vec2 force(0.0f, 0.0f);
             if (hapticForceManager != nullptr)
                 force = hapticForceManager->getHandleForce();

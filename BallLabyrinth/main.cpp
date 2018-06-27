@@ -146,7 +146,7 @@ main(int argc, char* argv[])
         = { OBJ_FILE_PATH_BALL, labyrinthObjFilePath }; /**< Path for obj files. */
     GLMain glMain(mainwindow, maincontext, objFilePaths, materialFolder);
 
-    showMessageBox(0.0);
+    quit = showMessageBox(0.0f) == 1;
 
 
     /** Start Handle communication **/
@@ -296,10 +296,11 @@ main(int argc, char* argv[])
 
         if (!quit)
         {
-            if (showMessageBox(endTime) != 0)
-            {
-                break;
-            }
+            quit = showMessageBox(endTime) == 1;
+        }
+        else
+        {
+            break;
         }
 
         labyrinthObjFilePath
