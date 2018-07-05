@@ -43,10 +43,6 @@ float Tp = 0;              // torque of the motor pulley
 float duty = 0;            // duty cylce (between 0 and 255)
 unsigned int output = 0;    // output command to the motor
 
-float sgn(float x) {
-  return x > 0 ? 1 : x < 0 ? -1 : 0;
-}
-
 void setup() {
   // Set up Serial communication
   Serial.begin(500000);
