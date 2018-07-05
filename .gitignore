@@ -44,3 +44,8 @@ install_manifest.txt
 .idea/
 */cmake-build-debug/*
 cmake-build-debug/
+
+# ycm
+
+BallLabyrinth/.ycm_extra_conf.py
+
