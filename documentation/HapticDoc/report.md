@@ -66,6 +66,8 @@ The forces are split for each axis ($x, y$), and mapped to the corresponding han
 
 ## User Manual
 
+The executable needs the adresses of the Hapkits as the first and second argument.
+
 Each of the haptic feebacks can be toggled to provide different user experiences.
 
 The follwing key bindings are used to toggle haptic feedback
