@@ -225,8 +225,8 @@ main(int argc, char* argv[])
             quit = keyMap[SDLK_q];
 
 
-            xAxisRotation = -handleInterface.getPos1() / 10.0;
-            yAxisRotation = -handleInterface.getPos2() / 10.0;
+            xAxisRotation = -handleInterface.getPos1() / 3.0;
+            yAxisRotation = -handleInterface.getPos2() / 3.0;
 
             if (keyMap[SDLK_UP])
             {
