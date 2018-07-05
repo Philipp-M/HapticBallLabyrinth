@@ -8,17 +8,17 @@ This virtual labyrinth is controlled with two Hapkits
 
 ### Building and running
 
-$ cd BallLabyrinth
-$ mkdir build
-$ cd ./build/
-$ cmake ..
-$ make
-$ cd ..
-$ ./build/BallLabyrinth arg1 arg2
+    $ cd BallLabyrinth
+    $ mkdir build
+    $ cd ./build/
+    $ cmake ..
+    $ make
+    $ cd ..
+    $ ./build/BallLabyrinth arg1 arg2
 
 In our case
 
-$ ./build/BallLabyrinth /dev/ttyUSB0 /dev/ttyUSB1
+    $ ./build/BallLabyrinth /dev/ttyUSB0 /dev/ttyUSB1
 
 The executable needs the file descriptors of the serial interface of the Hapkits as the first and second argument.
 
